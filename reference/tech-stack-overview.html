@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Tra Cứu Tech Stack Portfolio</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Reference Document &bull; Cheat Sheet</div>
+      <h1>Tổng Quan Tech Stack Dự Án Portfolio</h1>
+      <p>Bản tóm tắt cô đọng các quyết định kiến trúc, tiêu chuẩn công nghệ và lý do lựa chọn trong dự án.</p>
+    </header>
+
+    <main>
+      <h2>1. Các Trụ Cột Công Nghệ Chính</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Thành phần</th>
+            <th>Lựa chọn</th>
+            <th>Lý do &amp; Lợi ích cốt lõi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Framework</strong></td>
+            <td>Astro 7 (SSG)</td>
+            <td>Mặc định gửi 0 KB JS; content collections có schema an toàn; tối ưu hóa ảnh tự động; build siêu nhanh với Rust/Vite 8.</td>
+          </tr>
+          <tr>
+            <td><strong>Styling</strong></td>
+            <td>Plain Modern CSS</td>
+            <td>Không phụ thuộc Tailwind; dùng CSS Nesting (Baseline), <code>light-dark()</code> cho dark mode, CSS custom properties tự nhiên.</td>
+          </tr>
+          <tr>
+            <td><strong>Animation</strong></td>
+            <td>Native Browser CSS</td>
+            <td><code>@starting-style</code> (Hero), <code>@view-transition</code> (chuyển trang), <code>animation-timeline: view()</code> (scroll reveal); không cần thư viện JS.</td>
+          </tr>
+          <tr>
+            <td><strong>Hosting</strong></td>
+            <td>Cloudflare Workers / Pages</td>
+            <td>Miễn phí và không giới hạn request cho static assets; hỗ trợ custom domain; không giới hạn phi thương mại như Vercel Hobby.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Chỉ Số Mục Tiêu (Web Standards)</h2>
+      <ul>
+        <li><strong>Core Web Vitals:</strong> LCP &le; 2.5s, INP &le; 200ms, CLS &le; 0.1 (đo ở phân vị 75).</li>
+        <li><strong>Accessibility (WCAG 2.2 AA):</strong> Độ tương phản chữ &ge; 4.5:1; vùng bấm &ge; 24&times;24px; hỗ trợ đầy đủ <code>prefers-reduced-motion</code>.</li>
+        <li><strong>JavaScript Payload:</strong> 0 KB JS cho luồng đọc nội dung mặc định.</li>
+      </ul>
+
+      <h2>3. Ma Trận Quyết Định: Chọn gì &amp; Bỏ gì?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Công nghệ cân nhắc</th>
+            <th>Trạng thái</th>
+            <th>Lý do quyết định</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Next.js 16</td>
+            <td>Bỏ qua</td>
+            <td>Quá nặng cho site tĩnh; static export làm mất image optimization mặc định; luôn đính kèm React runtime.</td>
+          </tr>
+          <tr>
+            <td>Tailwind CSS</td>
+            <td>Bỏ qua</td>
+            <td>Thêm build step và lớp trừu tượng; CSS native hiện đại (nesting, variables, light-dark) đã đáp ứng đủ và gọn gàng hơn.</td>
+          </tr>
+          <tr>
+            <td>GSAP / Motion</td>
+            <td>Bỏ qua</td>
+            <td>Thêm từ 18&ndash;35 kB bundle; CSS native hiện đại đã xử lý mượt mà chuyển trang và hiệu ứng cuộn ngoài main thread.</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="../lessons/0001-kien-truc-zero-js-va-astro.html">Quay lại Bài 1</a></div>
+      <div>Tài liệu tham khảo dự án Portfolio</div>
+    </footer>
+  </div>
+</body>
+</html>

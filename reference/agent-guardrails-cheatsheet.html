@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bảng Quy Tắc Giao Việc Cho AI Agent (Agent Guardrails)</title>
+  <link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Reference Document &bull; Agent Directives</div>
+      <h1>Bảng Quy Tắc Giao Việc Cho AI Agent (Agent Guardrails)</h1>
+      <p>Bản tóm tắt cô đọng sẵn sàng copy &amp; paste vào System Prompt hoặc nhiệm vụ cho bất kỳ AI Coding Agent nào (Claude Code, Antigravity, Cursor...) khi làm việc trong dự án này.</p>
+    </header>
+
+    <main>
+      <h2>1. Đoạn Chỉ Thị Cốt Lõi (Core Agent Directives)</h2>
+      <div class="callout">
+        <p><em>Hãy sao chép đoạn dưới đây vào mỗi yêu cầu lớn gửi cho Agent:</em></p>
+      </div>
+
+<pre><code># AGENT CONSTRAINTS CHO DỰ ÁN PORTFOLIO:
+1. NGUYÊN TẮC TỐI GIẢN (PONYTAIL ULTRA):
+   - Mặc định chọn giải pháp native của trình duyệt thay vì cài thư viện ngoài.
+   - Không được tự ý `npm install` bất kỳ package nào ngoài Astro và @astrojs/sitemap.
+
+2. KIẾN TRÚC & FRAMEWORK:
+   - Sử dụng Astro 7 ở chế độ tĩnh (`output: 'static'`).
+   - Mặc định ship 0 KB JavaScript xuống client. Tuyệt đối không thêm `client:load` hay tạo React/JSX component trừ khi được yêu cầu rõ ràng.
+
+3. STYLING (PLAIN MODERN CSS):
+   - Không dùng Tailwind CSS.
+   - Sử dụng CSS Nesting native và scoped styles trong thẻ &lt;style&gt; của component.
+   - Mọi màu sắc phải dùng biến tokens trong `src/styles/global.css` và hàm `light-dark()`.
+
+4. ANIMATION & MOTION:
+   - 100% CSS native: `@starting-style` cho Hero, `@view-transition` cho chuyển trang, `animation-timeline: view()` cho scroll reveal.
+   - Tuyệt đối không cài GSAP, Framer Motion hay Lenis.
+   - Chỉ animate thuộc tính `opacity` và `translate`. Bọc toàn bộ trong `@media (prefers-reduced-motion: no-preference)`.
+
+5. DATA & NỘI DUNG:
+   - Case studies đặt trong `src/content/projects/*.md` và tuân thủ schema Zod trong `src/content.config.ts`.
+   - Hiển thị hình ảnh bằng component `&lt;Image /&gt;` từ `astro:assets` với `fetchpriority="high"` cho ảnh Hero và không lazy-load ảnh trên màn hình đầu tiên.
+</code></pre>
+
+      <h2>2. Checklist Nghiệm Thu Code Của Agent (Review Checklist)</h2>
+      <ul>
+        <li>[ ] <code>git status</code> / <code>package.json</code>: Không xuất hiện dependency mới nào.</li>
+        <li>[ ] <code>dist/</code>: Không sinh ra file JS nào trong luồng đọc trang bình thường.</li>
+        <li>[ ] CSS: Không animate <code>width</code>, <code>height</code>, <code>top</code>, <code>left</code>, <code>margin</code>.</li>
+        <li>[ ] Accessibility: Các nút icon mạng xã hội &ge; 24&times;24px, có <code>aria-label</code>.</li>
+        <li>[ ] Colors: Màu chữ <code>--muted</code> đạt tương phản &ge; 4.5:1 so với <code>--bg</code> ở cả Light và Dark mode.</li>
+      </ul>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="../lessons/0007-cam-nang-kiem-soat-agent-cho-project.html">Quay lại Bài 7</a></div>
+      <div><a href="../lessons/index.html">Xem Lộ Trình Toàn Khóa &rarr;</a></div>
+    </footer>
+  </div>
+</body>
+</html>

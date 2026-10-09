@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài 6: Cloudflare Workers Static Assets &amp; Chiến Lược Triển Khai</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Bài học 0006 &bull; Triển Khai &amp; Hạ Tầng</div>
+      <h1>Cloudflare Workers Static Assets &amp; Chiến Lược Triển Khai</h1>
+      <p>Hiểu rõ hạ tầng phân phối nội dung tĩnh toàn cầu, miễn phí vĩnh viễn, không giới hạn lưu lượng truy cập và an toàn pháp lý cho portfolio cá nhân.</p>
+    </header>
+
+    <main>
+      <div class="callout">
+        <p><strong>Mục tiêu kiểm soát Agent:</strong> AI Agent thường tự ý cài các adapter máy chủ nặng nề (như <code>@astrojs/node</code>) hoặc hướng dẫn deploy lên các nền tảng có rủi ro điều khoản. Bài học này giúp bạn giữ vững kiến trúc static thuần túy khi chỉ đạo agent.</p>
+      </div>
+
+      <h2>1. Vì Sao Chọn Cloudflare Thay Vì Vercel Hay Netlify?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nền tảng</th>
+            <th>Chính sách gói miễn phí (Free Tier)</th>
+            <th>Đánh giá cho Portfolio cá nhân</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Cloudflare Workers / Pages</strong></td>
+            <td><strong>Miễn phí và không giới hạn request</strong> tới static assets; hỗ trợ custom domain kèm SSL tự động toàn cầu.</td>
+            <td><strong>Lựa chọn tối ưu:</strong> Tốc độ Edge CDN cực nhanh, không lo bị khóa tài khoản vì quá tải truy cập.</td>
+          </tr>
+          <tr>
+            <td><strong>Vercel Hobby</strong></td>
+            <td>Giới hạn nghiêm ngặt: <em>"non-commercial, personal use only"</em>.</td>
+            <td><strong>Rủi ro:</strong> Nếu bạn để portfolio nhận dự án freelance hoặc kinh doanh, bạn có nguy cơ vi phạm điều khoản gói cá nhân.</td>
+          </tr>
+          <tr>
+            <td><strong>Netlify Free</strong></td>
+            <td>Hệ thống tín chỉ hạn mức: 300 credits/tháng (mỗi lần deploy và dung lượng đều trừ điểm).</td>
+            <td><strong>Hạn chế:</strong> Có thể cạn kiệt credit nhanh chóng nếu bạn deploy liên tục nhiều lần trong tháng.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout">
+        <p><strong>Bối cảnh công nghệ:</strong> Vào tháng 1/2026, đội ngũ phát triển Astro chính thức gia nhập Cloudflare. Astro vẫn là mã nguồn mở 100% nhưng được tích hợp hoàn hảo nhất với hạ tầng Cloudflare.</p>
+      </div>
+
+      <h2>2. Mô Hình Xuất Tĩnh (Static Output)</h2>
+      <p>Trong file cấu hình <code>astro.config.mjs</code>, chế độ mặc định của Astro là <code>output: 'static'</code>:</p>
+
+<pre><code>import { defineConfig } from 'astro/config';
+import sitemap from '@astrojs/sitemap';
+
+export default defineConfig({
+  site: 'https://tenban.dev', // Bắt buộc khai báo để sinh sitemap và canonical URL chuẩn
+  integrations: [sitemap()],
+});
+</code></pre>
+
+      <p>Khi bạn chạy lệnh:</p>
+<pre><code>npm run build
+</code></pre>
+      <p>Astro đọc toàn bộ component và Markdown, biên dịch ra thư mục <code>dist/</code> gồm toàn các file HTML, CSS và hình ảnh tĩnh WebP. Thư mục này có thể đặt lên bất kỳ máy chủ CDN nào trên thế giới mà không cần Node.js chạy ngầm.</p>
+
+      <h2>3. Quy Trình Triển Khai Lên Cloudflare</h2>
+      <p>Có hai cách triển khai cực kỳ đơn giản và nhanh chóng:</p>
+      <ol>
+        <li><strong>Kết nối Git (Khuyên dùng):</strong> Đẩy code lên GitHub. Trong Cloudflare Dashboard, kết nối với kho lưu trữ. Cloudflare sẽ tự động build và deploy mỗi khi bạn push code mới.</li>
+        <li><strong>Dùng công cụ dòng lệnh (Wrangler):</strong>
+<pre><code>npx wrangler deploy
+</code></pre>
+        </li>
+      </ol>
+
+      <h2>4. Nguyên Tắc Điều Khiển Agent Cho Module Này</h2>
+      <div class="callout">
+        <p><strong>Chỉ thị cho AI Agent:</strong><br>
+        1. <em>"Giữ nguyên cấu hình mặc định <code>output: 'static'</code> trong <code>astro.config.mjs</code>. Tuyệt đối không cài thêm bất kỳ SSR adapter nào (như @astrojs/node hay @astrojs/vercel)."</em><br>
+        2. <em>"Luôn khai báo đúng thuộc tính <code>site</code> với tên miền chính thức trong file cấu hình Astro."</em><br>
+        3. <em>"Trước khi triển khai, luôn chạy lệnh <code>npm run build</code> và kiểm tra thư mục <code>dist/</code> đảm bảo không có file JavaScript thừa."</em></p>
+      </div>
+
+      <h2>5. Bài Tập Củng Cố Nhận Thức (Retrieval Practice)</h2>
+      <div class="quiz-section">
+        <div class="quiz-title">Kiểm Tra Nhanh</div>
+
+        <!-- Question 1 -->
+        <div class="quiz-card">
+          <div class="quiz-question">1. Lợi thế pháp lý lớn nhất của Cloudflare so với gói Vercel Hobby khi làm portfolio là gì?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Vercel cấm dùng gói Hobby cho mục đích thương mại, trong khi Cloudflare không giới hạn người dùng nhận việc freelance.">
+              <input type="radio" name="q1">
+              <span>Không cấm việc sử dụng trang web cho mục đích tìm kiếm việc freelance.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Cả hai nền tảng đều hỗ trợ liên kết tên miền riêng tùy biến cho người dùng.">
+              <input type="radio" name="q1">
+              <span>Cho phép bạn đăng ký tên miền quốc tế hoàn toàn miễn phí mãi mãi.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro chạy tốt trên cả hai nơi, không bị cấm trên nền tảng Vercel.">
+              <input type="radio" name="q1">
+              <span>Cấm toàn bộ các website xây dựng bằng Astro hoạt động trên mạng.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="quiz-card">
+          <div class="quiz-question">2. Tại sao ta không cần cài đặt thêm adapter máy chủ nào trong file cấu hình Astro?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Dự án xuất ra các file tĩnh thuần túy (HTML/CSS) nên CDN có thể phục vụ trực tiếp mà không cần backend runtime.">
+              <input type="radio" name="q2">
+              <span>Dự án xuất ra toàn bộ file tĩnh và không cần môi trường backend.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro vẫn hỗ trợ nhiều adapter cho Node, Deno, Cloudflare Workers khi cần làm SSR thực sự.">
+              <input type="radio" name="q2">
+              <span>Astro không thể tương thích với bất kỳ máy chủ nào trên thế giới.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Adapter không làm hỏng máy tính hay gây lỗi hệ thống phần cứng.">
+              <input type="radio" name="q2">
+              <span>Cài đặt adapter sẽ làm cháy hỏng hoàn toàn ổ cứng của máy tính.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+      </div>
+
+      <h2>6. Tài Liệu Tham Khảo Chính Thống</h2>
+      <ul>
+        <li><a href="https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/" target="_blank" rel="noopener">Cloudflare Workers: Static Assets Limits</a> &mdash; Chính sách miễn phí và không giới hạn lưu lượng cho assets tĩnh.</li>
+        <li><a href="https://astro.build/blog/joining-cloudflare/" target="_blank" rel="noopener">Astro Blog: Joining Cloudflare</a> &mdash; Thông cáo hợp tác chiến lược giữa Astro và Cloudflare.</li>
+      </ul>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="0005-web-vitals-accessibility-va-wcag.html">Bài 5: Core Web Vitals &amp; WCAG 2.2</a></div>
+      <div><a href="0007-cam-nang-kiem-soat-agent-cho-project.html">Bài 7: Cẩm Nang Điều Khiển Agent &rarr;</a></div>
+    </footer>
+  </div>
+</body>
+</html>

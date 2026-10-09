@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài 7: Cẩm Nang Điều Khiển AI Agent Trong Project Này</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Bài học 0007 &bull; Làm Chủ Công Cụ &amp; Agent</div>
+      <h1>Cẩm Nang Điều Khiển AI Agent Trong Project Này</h1>
+      <p>Bí quyết thiết lập hàng rào kỹ thuật, ngăn chặn tình trạng phình to mã nguồn và ra lệnh chính xác để AI Agent code chuẩn kiến trúc tối giản theo ý bạn 100%.</p>
+    </header>
+
+    <main>
+      <div class="callout">
+        <p><strong>Bản chất vấn đề:</strong> AI Agent được đào tạo trên dữ liệu của hàng triệu dự án phổ thông, nơi người ta thường xuyên lạm dụng React, Tailwind và các thư viện JavaScript cồng kềnh. Nếu bạn không kiểm soát chặt, Agent sẽ vô thức biến dự án của bạn thành một mớ mã nguồn cồng kềnh!</p>
+      </div>
+
+      <h2>1. Ba Thói Quen Xấu Thường Gặp Của AI Agent</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Thói quen xấu của Agent</th>
+            <th>Hậu quả cho dự án</th>
+            <th>Cách bạn chặn đứng ngay từ đầu</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Tự ý cài thêm thư viện</strong><br>(Tailwind, Lucide icons, Framer Motion, Axios)</td>
+            <td>Làm phình file <code>package.json</code>, tăng thời gian build và phát sinh xung đột phiên bản.</td>
+            <td>Đặt quy tắc cấm rõ ràng: <em>"Không cài bất kỳ npm package nào ngoài danh mục đã định nghĩa."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Biến mọi thứ thành React Component</strong></td>
+            <td>Phá vỡ kiến trúc Zero-JS của Astro; gửi hàng chục KB JavaScript xuống client để hydrate.</td>
+            <td>Ép buộc Agent: <em>"Chỉ được viết file <code>.astro</code> thuần túy, không tạo component <code>.jsx</code>/<code>.tsx</code>."</em></td>
+          </tr>
+          <tr>
+            <td><strong>Animate các thuộc tính làm giật layout</strong><br>(Thay đổi height, width, top, margin)</td>
+            <td>Kích hoạt quá trình reflow liên tục của trình duyệt, làm tụt FPS và tăng điểm lỗi CLS.</td>
+            <td>Quy định khắt khe: <em>"Chỉ được phép animate <code>opacity</code> và <code>translate</code>."</em></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Bộ Quy Tắc Vàng (Guardrails) Khi Giao Nhiệm Vụ Cho Agent</h2>
+      <p>Khi bắt đầu một phiên làm việc hoặc giao một task mới, bạn hãy đính kèm bộ quy tắc sau vào prompt của mình:</p>
+
+      <div class="callout">
+        <p><strong>Bộ Hàng Rào Kỹ Thuật (Copy &amp; Paste cho Agent):</strong><br>
+        <code>1. MÔ HÌNH:</code> Dự án chạy Astro 7 ở chế độ static (0 KB JS mặc định). Không dùng client-side hydration trừ khi có yêu cầu đặc biệt.<br>
+        <code>2. STYLING:</code> Plain Modern CSS với CSS Nesting và Scoped Styles trong <code>&lt;style&gt;</code>. Không cài Tailwind. Mọi mã màu dùng <code>light-dark()</code> và biến token trong <code>global.css</code>.<br>
+        <code>3. ANIMATION:</code> 100% CSS Native (<code>@starting-style</code>, <code>@view-transition</code>, <code>animation-timeline</code>). Không cài GSAP hay Motion.<br>
+        <code>4. DATA:</code> Mọi case study phải nằm trong <code>src/content/projects/</code> và tuân thủ schema Zod trong <code>content.config.ts</code>.<br>
+        <code>5. ACCESSIBILITY:</code> Mọi hình ảnh dùng component <code>&lt;Image /&gt;</code>, nút bấm &ge; 24px, focus outline rõ ràng.</p>
+      </div>
+
+      <h2>3. Các Mẫu Câu Lệnh (Prompt Templates) Chuẩn Mực</h2>
+
+      <h3>Mẫu 1: Yêu cầu tạo Component mới (Ví dụ: Card hiển thị dự án)</h3>
+      <pre><code>Hãy tạo cho tôi component ProjectCard.astro tại thư mục src/components/:
+- Nhận props gồm dữ liệu của một project entry từ Content Collections.
+- Sử dụng component &lt;Image /&gt; từ 'astro:assets' để hiển thị cover.
+- Thêm thuộc tính style="view-transition-name: cover-${entry.id}" trên ảnh.
+- Toàn bộ CSS viết trong thẻ &lt;style&gt; của component, dùng CSS Nesting và token màu trong global.css.
+- Hiệu ứng hover chỉ thay đổi translate: 0 -2px, không dùng JS.</code></pre>
+
+      <h3>Mẫu 2: Yêu cầu thêm Case Study mới vào Markdown</h3>
+      <pre><code>Hãy viết một bài case study mới tại src/content/projects/he-thong-thanh-toan.md:
+- Đảm bảo frontmatter chứa đầy đủ: title, summary, cover, tags, order, repo, live theo đúng schema Zod trong src/content.config.ts.
+- Nội dung bài viết tuân thủ cấu trúc 4 phần:
+  1. Problem (Vấn đề cần giải quyết)
+  2. Role & Constraints (Vai trò & Ràng buộc kỹ thuật)
+  3. Solution (Giải pháp kỹ thuật chi tiết)
+  4. Outcome (Kết quả định lượng đạt được)</code></pre>
+
+      <h2>4. Phương Pháp Thẩm Định Nhanh Code Do Agent Tạo Ra</h2>
+      <p>Sau khi Agent hoàn thành một tác vụ, hãy dùng 3 câu hỏi kiểm tra nhanh này:</p>
+      <ol>
+        <li><strong>Kiểm tra <code>git diff package.json</code>:</strong> Có dòng dependency nào mới xuất hiện mà bạn không cho phép không? Nếu có &rarr; bắt Agent rollback ngay lập tức.</li>
+        <li><strong>Kiểm tra file build:</strong> Chạy <code>npm run build</code>. Xem thư mục <code>dist/_astro/</code> có xuất hiện file <code>.js</code> lạ nào không? Đối với các trang thông thường, con số phải là <strong>0 file JS</strong>.</li>
+        <li><strong>Kiểm tra CSS:</strong> Liệu Agent có tự ý hardcode mã màu như <code>color: #333</code> thay vì dùng biến token <code>var(--fg)</code> hay không?</li>
+      </ol>
+
+      <h2>5. Bài Tập Củng Cố Nhận Thức (Retrieval Practice)</h2>
+      <div class="quiz-section">
+        <div class="quiz-title">Kiểm Tra Nhanh</div>
+
+        <!-- Question 1 -->
+        <div class="quiz-card">
+          <div class="quiz-question">1. Khi muốn ra lệnh cho AI Agent tạo hiệu ứng, mệnh lệnh nào sau đây là chuẩn mực nhất?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Ràng buộc trực tiếp công nghệ native (CSS) và thuộc tính GPU giúp agent không lạc hướng sang các thư viện nặng.">
+              <input type="radio" name="q1">
+              <span>Chỉ dùng CSS native và chỉ được phép animate thuộc tính opacity cùng translate.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Prompt chung chung 'làm cho đẹp' là nguyên nhân hàng đầu khiến agent tự ý cài GSAP hay Framer Motion.">
+              <input type="radio" name="q1">
+              <span>Hãy cài đặt thư viện chuyển động nào tiện nhất để giao diện nhìn thật bắt mắt.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Viết JavaScript scroll listener là anti-pattern làm nặng main thread của trang web.">
+              <input type="radio" name="q1">
+              <span>Hãy viết một hàm JavaScript lắng nghe sự kiện cuộn chuột trên toàn bộ trang web.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="quiz-card">
+          <div class="quiz-question">2. Bước kiểm tra nhanh hiệu quả nhất để phát hiện AI Agent có làm phình to dự án hay không là gì?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Kiểm tra thay đổi trong file package.json và thư mục dist/ sau khi build sẽ phát hiện ngay thư viện thừa hoặc mã JS lạ.">
+              <input type="radio" name="q2">
+              <span>Kiểm tra xem file package.json có bị cài thêm các thư viện lạ nào hay không.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Đổi tên file không giúp kiểm tra được chất lượng hay dung lượng mã nguồn.">
+              <input type="radio" name="q2">
+              <span>Thử đổi tên ngẫu nhiên toàn bộ các thư mục trong dự án xem có bị lỗi không.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Agent là công cụ tự động hóa, tắt máy tính không phải là phương pháp đánh giá code.">
+              <input type="radio" name="q2">
+              <span>Khởi động lại máy tính cá nhân để xem tốc độ kết nối internet có tăng lên không.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+      </div>
+
+      <h2>6. Tài Liệu Đọc &amp; Tổng Kết Khóa Học</h2>
+      <p>Chúc mừng bạn! Sau khi hoàn thành 7 bài học lý thuyết này, bạn đã nắm trọn vẹn bức tranh kiến trúc kỹ thuật của dự án portfolio. Bạn hiện sở hữu đầy đủ ngôn ngữ, tư duy và bộ tiêu chuẩn để trở thành một "nhạc trưởng" tự tin chỉ huy các AI Agent xây dựng dự án một cách hoàn hảo và tinh gọn nhất.</p>
+
+      <ul>
+        <li><a href="../reference/tech-stack-overview.html">Xem lại Bảng Tra Cứu Toàn Bộ Tech Stack</a></li>
+        <li><a href="index.html">Quay về Trang Tổng Quan Lộ Trình Toàn Khóa</a></li>
+      </ul>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="0006-cloudflare-workers-va-deploy-strategy.html">Bài 6: Cloudflare Workers &amp; Deploy</a></div>
+      <div><a href="index.html">Xem Lộ Trình Toàn Khóa &rarr;</a></div>
+    </footer>
+  </div>
+</body>
+</html>

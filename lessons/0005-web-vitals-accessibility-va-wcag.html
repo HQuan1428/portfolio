@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài 5: Core Web Vitals, SEO &amp; Chuẩn Tiếp Cận WCAG 2.2 AA</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Bài học 0005 &bull; Chất Lượng &amp; Chuẩn Quốc Tế</div>
+      <h1>Core Web Vitals, SEO &amp; Chuẩn Tiếp Cận WCAG 2.2 AA</h1>
+      <p>Nắm vững các chỉ số đo lường trải nghiệm người dùng hiện đại, tối ưu SEO tĩnh và biến portfolio thành một sản phẩm công nghệ hoàn hảo đáp ứng chuẩn quốc tế.</p>
+    </header>
+
+    <main>
+      <div class="callout">
+        <p><strong>Mục tiêu kiểm soát Agent:</strong> Nhà tuyển dụng cấp cao và các chuyên gia frontend đánh giá ứng viên qua chi tiết: tốc độ tải, độ mượt khi bấm phím Tab, và độ tương phản màu. Biết các tiêu chuẩn này giúp bạn thẩm định chính xác chất lượng code mà AI Agent tạo ra.</p>
+      </div>
+
+      <h2>1. Bộ Ba Chỉ Số Core Web Vitals (Google &amp; Web.dev)</h2>
+      <p>Google đo lường hiệu năng thực tế của trang web ở phân vị thứ 75 (75th percentile) qua 3 chỉ số cốt lõi:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Chỉ số</th>
+            <th>Mục tiêu chuẩn</th>
+            <th>Cách kiến trúc dự án của chúng ta đáp ứng</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>LCP</strong><br>(Largest Contentful Paint)</td>
+            <td>&le; <strong>2.5 giây</strong><br>(Thời gian phần tử nội dung lớn nhất hiện lên)</td>
+            <td>Astro xuất sẵn HTML tĩnh. <strong>Quy tắc vàng:</strong> Không bao giờ đặt <code>loading="lazy"</code> cho ảnh Hero; dùng <code>fetchpriority="high"</code> để tải ngay lập tức.</td>
+          </tr>
+          <tr>
+            <td><strong>INP</strong><br>(Interaction to Next Paint)</td>
+            <td>&le; <strong>200 mili-giây</strong><br>(Độ trễ phản hồi khi người dùng bấm/tương tác)</td>
+            <td>Astro ship <strong>0 KB JS</strong> mặc định. Main Thread hoàn toàn rảnh rỗi, người dùng bấm vào là trang phản hồi tức thì (INP thực tế thường &lt; 20ms).</td>
+          </tr>
+          <tr>
+            <td><strong>CLS</strong><br>(Cumulative Layout Shift)</td>
+            <td>&le; <strong>0.1</strong><br>(Độ dịch chuyển giật cục của giao diện)</td>
+            <td>Sử dụng component <code>&lt;Image /&gt;</code> từ <code>astro:assets</code> để luôn tự động tính sẵn <code>width</code> và <code>height</code>, loại bỏ 100% hiện tượng giật trang khi ảnh tải xong.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Chuẩn Tiếp Cận WCAG 2.2 AA: Chi Tiết Đắt Giá Của Senior Dev</h2>
+      <p>Một trang web portfolio chuyên nghiệp phải dùng được cho mọi người dùng, kể cả người khiếm thị hay người dùng bàn phím:</p>
+
+      <h3>A. Độ Tương Phản Màu (SC 1.4.3 &amp; 1.4.11)</h3>
+      <ul>
+        <li>Chữ thường so với nền: Tỷ lệ tương phản tối thiểu <strong>4.5 : 1</strong>.</li>
+        <li>Chữ lớn (trên 24px) và các thành phần đồ họa/đường viền: Tối thiểu <strong>3.0 : 1</strong>.</li>
+        <li><strong>Lưu ý:</strong> Phải kiểm tra độ tương phản ở <em>cả hai chế độ</em> Light Mode và Dark Mode.</li>
+      </ul>
+
+      <h3>B. Kích Thước Vùng Bấm (Target Size - Mới Trong WCAG 2.2, SC 2.5.8)</h3>
+      <p>Các nút bấm, link icon (GitHub, LinkedIn, Resume PDF) trên điện thoại cảm ứng phải có kích thước tối thiểu <strong>24 &times; 24 CSS pixels</strong> để ngón tay dễ dàng bấm trúng mà không bị bấm nhầm.</p>
+
+      <h3>C. Chống Che Khuất Vết Focus (Focus Not Obscured - SC 2.4.11)</h3>
+      <p>Khi người dùng duyệt web bằng phím <code>Tab</code>, nếu trang web có Sticky Header cố định ở đầu trang, vết focus không được bị header che mất. Giải pháp chuẩn CSS cực kỳ đơn giản:</p>
+
+<pre><code>/* global.css */
+html {
+  /* Dự phòng khoảng trống 5rem để header không che mất phần tử được focus */
+  scroll-padding-top: 5rem;
+}
+
+:focus-visible {
+  /* Vết viền focus rõ ràng, nổi bật */
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+</code></pre>
+
+      <h2>3. SEO Tĩnh Chuẩn Mực &amp; Open Graph</h2>
+      <p>Một layout chuẩn (<code>src/layouts/Base.astro</code>) cần bao gồm đầy đủ:</p>
+      <ul>
+        <li>Semantic HTML: Cấu trúc rõ ràng <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;footer&gt;</code>; đúng thứ tự thẻ <code>&lt;h1&gt;</code> &rarr; <code>&lt;h2&gt;</code> &rarr; <code>&lt;h3&gt;</code>.</li>
+        <li>Open Graph Tags: Cung cấp <code>og:title</code>, <code>og:description</code>, <code>og:image</code> (ảnh kích thước 1200&times;630px) để hiển thị bản xem trước đẹp mắt khi dán link trên mạng xã hội.</li>
+        <li>Sitemap tự động: Tích hợp <code>@astrojs/sitemap</code> tự động sinh file <code>sitemap-index.xml</code> mỗi khi build dự án.</li>
+      </ul>
+
+      <h2>4. Nguyên Tắc Điều Khiển Agent Cho Module Này</h2>
+      <div class="callout">
+        <p><strong>Chỉ thị cho AI Agent:</strong><br>
+        1. <em>"Không được đặt <code>loading='lazy'</code> trên ảnh đại diện Hero; bắt buộc dùng <code>fetchpriority='high'</code>."</em><br>
+        2. <em>"Mọi icon liên kết mạng xã hội hoặc nút bấm phải có kích thước tối thiểu 24x24px và có thuộc tính <code>aria-label</code> rõ ràng."</em><br>
+        3. <em>"Đảm bảo mã màu chữ biến <code>--muted</code> có tỷ lệ tương phản tối thiểu 4.5:1 so với biến <code>--bg</code> ở cả hai chế độ màu."</em></p>
+      </div>
+
+      <h2>5. Bài Tập Củng Cố Nhận Thức (Retrieval Practice)</h2>
+      <div class="quiz-section">
+        <div class="quiz-title">Kiểm Tra Nhanh</div>
+
+        <!-- Question 1 -->
+        <div class="quiz-card">
+          <div class="quiz-question">1. Vì sao ta tuyệt đối không nên đặt loading='lazy' cho hình ảnh đại diện tại phần Hero?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Ảnh Hero là phần tử LCP chính; lazy-load sẽ trì hoãn việc tải ảnh làm tụt điểm hiệu năng LCP nghiêm trọng.">
+              <input type="radio" name="q1">
+              <span>Trì hoãn tải ảnh Hero làm chậm chỉ số hiệu năng LCP rất nghiêm trọng.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="loading='lazy' là thuộc tính HTML chuẩn, không bao giờ làm hỏng giao diện hay vỡ hình.">
+              <input type="radio" name="q1">
+              <span>Làm hỏng hoàn toàn giao diện và khiến hình ảnh bị vỡ hạt trên màn hình.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Thuộc tính này không liên quan tới việc tính toán hay tăng giảm chi phí lưu trữ máy chủ.">
+              <input type="radio" name="q1">
+              <span>Làm tăng gấp đôi chi phí dịch vụ lưu trữ dữ liệu của toàn bộ dự án web.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="quiz-card">
+          <div class="quiz-question">2. Thuộc tính scroll-padding-top giải quyết vấn đề tiếp cận nào theo chuẩn WCAG 2.2?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="scroll-padding-top ngăn thanh menu cố định (sticky) che khuất phần tử đang được người dùng bấm Tab tới (SC 2.4.11).">
+              <input type="radio" name="q2">
+              <span>Ngăn chặn thanh header cố định che khuất phần tử được bấm phím Tab.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="scroll-padding-top chỉ điều chỉnh vị trí cuộn, không thể thay đổi cỡ chữ văn bản.">
+              <input type="radio" name="q2">
+              <span>Tự động tăng gấp ba kích thước phông chữ cho người dùng bị suy giảm thị lực.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Thuộc tính này không phải là bộ lọc màu sắc và không chuyển đổi trang web sang màu đen trắng.">
+              <input type="radio" name="q2">
+              <span>Chuyển đổi toàn bộ màu sắc của trang web sang chế độ hiển thị đen trắng.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+      </div>
+
+      <h2>6. Tài Liệu Tham Khảo Chính Thống</h2>
+      <ul>
+        <li><a href="https://web.dev/articles/vitals" target="_blank" rel="noopener">web.dev: Core Web Vitals</a> &mdash; Tài liệu chuẩn của Google về LCP, INP và CLS.</li>
+        <li><a href="https://www.w3.org/WAI/standards-guidelines/wcag/new-in-22/" target="_blank" rel="noopener">W3C: What's New in WCAG 2.2</a> &mdash; Tổng quan các tiêu chí tiếp cận mới (Focus Not Obscured, Target Size).</li>
+      </ul>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="0004-native-animations-va-motion-principles.html">Bài 4: Native Animations &amp; Motion</a></div>
+      <div><a href="0006-cloudflare-workers-va-deploy-strategy.html">Bài 6: Cloudflare Workers &amp; Deployment &rarr;</a></div>
+    </footer>
+  </div>
+</body>
+</html>

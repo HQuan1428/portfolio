@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài 1: Kiến Trúc Zero-JS &amp; Tại Sao Lại Là Astro Cho Portfolio?</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Bài học 0001 &bull; Kiến Trúc Nền Tảng</div>
+      <h1>Kiến Trúc Zero-JS &amp; Vì Sao Lại Là Astro Cho Portfolio?</h1>
+      <p>Nắm vững mô hình tư duy Static Site Generation (SSG), triết lý Zero-JS và lý do Astro vượt trội hơn Next.js đối với một trang web hướng nội dung.</p>
+    </header>
+
+    <main>
+      <div class="callout">
+        <p><strong>Gắn liền với Sứ mệnh:</strong> Để xây dựng một website portfolio đạt điểm hiệu năng tuyệt đối (Core Web Vitals) và giao diện gọn gàng, chúng ta cần hiểu rõ từng kilobyte mã nguồn gửi tới trình duyệt phục vụ mục đích gì.</p>
+      </div>
+
+      <h2>1. Ba Thế Hệ Kiến Trúc Web</h2>
+      <p>Trước khi đi sâu vào Astro, hãy nhìn lại cách các trang web hiển thị nội dung trên trình duyệt:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Mô hình</th>
+            <th>Cách hoạt động</th>
+            <th>Vấn đề đối với Portfolio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1. Plain HTML/CSS</strong><br>(Truyền thống)</td>
+            <td>Viết từng file <code>.html</code> thủ công. Tải cực nhanh, 0 KB JavaScript thừa.</td>
+            <td>Lặp lại code header/footer ở mọi file; không có hệ thống quản lý bài viết/dự án dạng module hay tự động nén ảnh.</td>
+          </tr>
+          <tr>
+            <td><strong>2. SPA / React / Next.js</strong><br>(Giai đoạn 2018&ndash;2024)</td>
+            <td>Gửi file HTML rỗng hoặc sơ bộ cùng một gói JS lớn (bundle). Trình duyệt tải JS về để "hydrate" và dựng trang.</td>
+            <td>Nặng nề không cần thiết. Người đọc chỉ xem bài viết nhưng điện thoại phải tốn pin giải nén hàng trăm KB mã React runtime.</td>
+          </tr>
+          <tr>
+            <td><strong>3. Astro (SSG + Islands)</strong><br>(Hiện đại)</td>
+            <td>Dùng cú pháp component để lập trình, nhưng tại thời điểm build (build time), toàn bộ component được biên dịch ra <strong>HTML/CSS thuần túy</strong>.</td>
+            <td>Vừa có trải nghiệm lập trình component tiện lợi như React, vừa xuất xưởng HTML nhẹ tênh như web truyền thống.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Triết Lý "Zero JavaScript by Default"</h2>
+      <p>Hầu hết các framework hiện đại (như Next.js hay Nuxt) coi JavaScript là trung tâm: ngay cả khi bạn chỉ viết một trang tĩnh, trình duyệt vẫn phải tải toàn bộ thư viện React/Vue để trang hoạt động.</p>
+      <p>Astro đảo ngược hoàn toàn tư duy này: <strong>Mặc định, không có một dòng JavaScript nào được gửi xuống trình duyệt!</strong></p>
+      
+      <div class="callout">
+        <p>Mã Astro được phân tách bởi rào chắn dấu ba gạch (<code>---</code>), gọi là <strong>Component Script</strong>:</p>
+      </div>
+
+<pre><code>---
+// Khối này CHỈ CHẠY TRÊN MÁY BẠN LÚC BUILD (Node.js/Rust)
+// Trình duyệt KHÔNG BAO GIỜ nhìn thấy đoạn mã này!
+const projectTitle = "Portfolio Hiện Đại";
+const date = new Date().getFullYear();
+---
+
+&lt;!-- Phần này được xuất ra thành HTML nguyên bản 100% --&gt;
+&lt;header&gt;
+  &lt;h1&gt;{projectTitle}&lt;/h1&gt;
+  &lt;p&gt;Bản quyền &copy; {date}&lt;/p&gt;
+&lt;/header&gt;
+</code></pre>
+
+      <p>Khi chạy lệnh <code>astro build</code>, Astro tính toán giá trị của biến và xuất ra HTML cuối cùng:</p>
+<pre><code>&lt;header&gt;
+  &lt;h1&gt;Portfolio Hiện Đại&lt;/h1&gt;
+  &lt;p&gt;Bản quyền &copy; 2026&lt;/p&gt;
+&lt;/header&gt;
+</code></pre>
+
+      <p>Trình duyệt nhận được file HTML nguyên chất này, hiển thị ngay lập tức mà không cần chờ tải hay giải nén bất kỳ framework runtime nào.</p>
+
+      <h2>3. So Sánh Trực Diện: Astro vs Next.js Cho Portfolio</h2>
+      <p>Next.js cũng có chế độ xuất tĩnh (<code>output: 'export'</code>). Vậy tại sao tài liệu nghiên cứu của dự án lại chọn <strong>Astro 7</strong>?</p>
+      <ul>
+        <li><strong>Không có Hydration Overhead:</strong> Next.js tĩnh vẫn phải tải toàn bộ React runtime (khoảng 70&ndash;100 kB JS tối thiểu) để xử lý định tuyến phía client. Astro ship <strong>0 KB JS</strong>.</li>
+        <li><strong>Tự Động Tối Ưu Hóa Ảnh:</strong> Khi dùng static export, Next.js <em>vô hiệu hóa</em> bộ tối ưu ảnh mặc định (bắt buộc dùng dịch vụ ngoài như Cloudinary). Ngược lại, Astro có sẵn <code>astro:assets</code> tự động chuyển đổi ảnh sang WebP/AVIF và tính toán kích thước chiều rộng/cao để triệt tiêu hiện tượng giật trang (CLS).</li>
+        <li><strong>Content Collections:</strong> Astro có sẵn công cụ quản lý nội dung Markdown/MDX với bộ kiểm tra kiểu dữ liệu Zod (kiểm tra bài viết có đủ ảnh cover, ngày đăng, tags hay không ngay khi gõ phím).</li>
+      </ul>
+
+      <h2>4. Bài Tập Kiểm Tra Mức Độ Hiểu Bài (Retrieval Practice)</h2>
+      <p>Hãy thử trả lời các câu hỏi dưới đây để củng cố kiến thức vừa học:</p>
+
+      <div class="quiz-section">
+        <div class="quiz-title">
+          <span>Kiểm Tra Nhanh</span>
+        </div>
+
+        <!-- Question 1 -->
+        <div class="quiz-card">
+          <div class="quiz-question">1. Triết lý "Zero JavaScript by default" của Astro có ý nghĩa gì đối với trình duyệt người dùng?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Astro render component trên server/máy build và chỉ xuất HTML tĩnh xuống client, loại bỏ hoàn toàn gánh nặng runtime.">
+              <input type="radio" name="q1">
+              <span>Trình duyệt chỉ nhận HTML thuần, không tải mã nguồn JS dư thừa.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro vẫn cho phép nhúng JavaScript tương tác khi cần thông qua cơ chế Islands Architecture (client:load, client:visible).">
+              <input type="radio" name="q1">
+              <span>Trình duyệt hoàn toàn cấm chạy bất kỳ tính năng tương tác người dùng nào.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro không liên quan tới WebAssembly; nó biên dịch code component thành HTML/CSS chuẩn.">
+              <input type="radio" name="q1">
+              <span>Trình duyệt tự động chuyển đổi toàn bộ mã React sang ngôn ngữ WebAssembly.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="quiz-card">
+          <div class="quiz-question">2. Tại sao dự án portfolio chọn Astro thay vì Next.js khi cả hai đều hỗ trợ xuất file tĩnh?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Next.js static export không hỗ trợ bộ tối ưu ảnh mặc định và vẫn đính kèm React bundle, trong khi Astro hỗ trợ sẵn và ship 0 JS.">
+              <input type="radio" name="q2">
+              <span>Astro hỗ trợ tối ưu ảnh sẵn có và không gửi React runtime.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro xuất ra các file tĩnh HTML/CSS nên có thể deploy trên bất kỳ CDN/static host nào mà không cần server Node.js.">
+              <input type="radio" name="q2">
+              <span>Astro yêu cầu máy chủ Nodejs chạy liên tục để phân phối mã.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro viết bằng JavaScript/TypeScript và HTML-like component, hoàn toàn không dùng cú pháp Python.">
+              <input type="radio" name="q2">
+              <span>Astro bắt buộc toàn bộ mã nguồn phải viết bằng cú pháp Python.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+      </div>
+
+      <h2>5. Nguồn Đọc Tham Khảo Uy Tín (Primary Source)</h2>
+      <p>Để tìm hiểu sâu hơn trực tiếp từ các nhà thiết kế của Astro, bạn hãy đọc bài viết chính thức:</p>
+      <ul>
+        <li><a href="https://docs.astro.build/en/concepts/why-astro/" target="_blank" rel="noopener">Astro Documentation: Why Astro &amp; The Islands Architecture</a> &mdash; Giải thích tại sao phương pháp này là tương lai của các trang web hướng nội dung.</li>
+      </ul>
+
+      <h2>6. Bước Tiếp Theo &amp; Thảo Luận</h2>
+      <p>Sau khi đã nắm rõ triết lý Zero-JS của Astro, bài học tiếp theo chúng ta sẽ tìm hiểu về <strong>Tổ chức Styling và CSS Hiện Đại (Nesting, <code>light-dark()</code>, Design Tokens)</strong> mà không cần tới Tailwind CSS.</p>
+
+      <div class="callout">
+        <p><strong>Bạn có thắc mắc gì không?</strong> Hãy trao đổi trực tiếp với tôi (Teacher Agent) về bất kỳ khái niệm nào bạn thấy chưa rõ hoặc muốn đào sâu thêm trước khi chúng ta tiếp tục nhé!</p>
+      </div>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="../reference/tech-stack-overview.html">Xem Bảng Tra Cứu Toàn Bộ Stack</a></div>
+      <div>Bài tiếp theo: Bài 2 &rarr;</div>
+    </footer>
+  </div>
+</body>
+</html>

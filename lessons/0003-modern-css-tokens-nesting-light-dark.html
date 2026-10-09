@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài 3: Modern Plain CSS Không Cần Tailwind (Tokens, Nesting, light-dark)</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Bài học 0003 &bull; Giao Diện &amp; Styling</div>
+      <h1>Modern Plain CSS: Tokens, Nesting &amp; light-dark()</h1>
+      <p>Khai thác sức mạnh của CSS hiện đại đã đạt chuẩn Baseline: Xây dựng hệ thống giao diện tinh gọn, hỗ trợ Dark Mode tự động 100% không dùng JavaScript và không cần Tailwind.</p>
+    </header>
+
+    <main>
+      <div class="callout">
+        <p><strong>Mục tiêu kiểm soát Agent:</strong> AI Agent rất thích cài Tailwind CSS theo thói quen mặc định. Khi hiểu rõ CSS hiện đại đã đủ mạnh, bạn sẽ dễ dàng ra lệnh cho agent dùng CSS thuần, giữ cho codebase sạch sẽ và không phụ thuộc công cụ ngoài.</p>
+      </div>
+
+      <h2>1. Vì Sao Dự Án Chọn Plain Modern CSS Thay Vì Tailwind?</h2>
+      <p>Tailwind giải quyết bài toán đặt tên class và CSS trùng lặp cho các dự án lớn từ năm 2018. Tuy nhiên, ở năm 2026, nền tảng web đã thay đổi:</p>
+      <ul>
+        <li><strong>Không thêm Dependency &amp; Build step:</strong> Không cần cài đặt <code>@tailwindcss/vite</code> hay lo lắng về các phiên bản đột phá (breaking changes) giữa v3 và v4.</li>
+        <li><strong>Astro đã có sẵn Scoped CSS:</strong> Mọi thẻ <code>&lt;style&gt;</code> viết bên trong file <code>.astro</code> đều được tự động gắn mã hash cục bộ. Bạn có thể đặt tên class ngắn gọn như <code>.hero</code>, <code>.card</code> mà không lo xung đột với các trang khác.</li>
+        <li><strong>Dễ đọc và bảo trì:</strong> File HTML không bị tràn ngập bởi hàng chục utility classes khó đọc (như <code>flex flex-col md:flex-row items-center justify-between p-4 dark:bg-zinc-900</code>).</li>
+      </ul>
+
+      <h2>2. CSS Nesting: Viết Lồng Tự Nhiên Không Cần Preprocessor</h2>
+      <p>Tính năng <strong>CSS Nesting</strong> hiện đã đạt chuẩn <em>Baseline Widely Available</em> (mọi trình duyệt phổ biến đều hỗ trợ natively):</p>
+
+<pre><code>/* global.css hoặc trong &lt;style&gt; của component */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+
+  /* Lồng thẻ con trực tiếp */
+  & h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Lồng trạng thái hover / focus */
+  &:hover {
+    border-color: var(--accent);
+  }
+}
+</code></pre>
+      <p>Bạn không cần SASS, PostCSS hay bất kỳ plugin nào. Trình duyệt tự parse cú pháp này một cách tối ưu.</p>
+
+      <h2>3. Hệ Thống Design Tokens Với CSS Custom Properties</h2>
+      <p>Toàn bộ thiết kế nhất quán của trang web được quản lý tập trung tại <code>src/styles/global.css</code> qua các biến <code>--token</code>:</p>
+
+<pre><code>:root {
+  /* Spacing Scale (Hệ quy chuẩn 4px/8px) */
+  --space-xs: 0.25rem;  /* 4px */
+  --space-sm: 0.5rem;   /* 8px */
+  --space-md: 1rem;     /* 16px */
+  --space-lg: 2rem;     /* 32px */
+
+  /* Typography Scale */
+  --font-base: 1rem;
+  --font-lg: 1.25rem;
+  --font-xl: 2rem;
+
+  /* Transition Easing (Chuẩn Material Design 3) */
+  --ease-out: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --dur-fast: 150ms;
+}
+</code></pre>
+
+      <h2>4. Đột Phá Dark Mode Với Hàm <code>light-dark()</code></h2>
+      <p>Thông thường, các dự án dùng Tailwind hay React phải cài thư viện, viết JavaScript kiểm tra theme, lưu vào <code>localStorage</code> và thêm class <code>.dark</code> vào thẻ <code>&lt;html&gt;</code>. Nếu JavaScript bị trễ, người dùng sẽ bị hiện tượng chớp sáng (flash of unstyled theme).</p>
+      <p>Với chuẩn <code>light-dark()</code> (Baseline 2024), dark mode trở nên kỳ diệu:</p>
+
+<pre><code>:root {
+  /* Bắt buộc: Khai báo trang web hỗ trợ cả 2 chế độ */
+  color-scheme: light dark;
+
+  /* Cú pháp: light-dark(giá_trị_sáng, giá_trị_tối) */
+  --bg: light-dark(#fafafa, #0b0b0c);
+  --fg: light-dark(#18181b, #ededed);
+  --muted: light-dark(#52525b, #a1a1aa);
+  --accent: light-dark(#2563eb, #60a5fa);
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+</code></pre>
+      <div class="callout">
+        <p><strong>Cơ chế:</strong> Trình duyệt tự động nhận biết hệ điều hành người dùng đang ở chế độ Sáng hay Tối và chọn đúng giá trị màu tương ứng. <strong>Không cần 1 dòng JavaScript nào, không chớp màn hình, hiệu năng 0ms latency.</strong></p>
+      </div>
+
+      <h2>5. Nguyên Tắc Điều Khiển Agent Cho Module Này</h2>
+      <div class="callout">
+        <p><strong>Chỉ thị cho AI Agent:</strong><br>
+        1. <em>"Không được cài Tailwind CSS. Sử dụng CSS thuần với tính năng CSS Nesting và Scoped Styles bên trong thẻ <code>&lt;style&gt;</code> của component."</em><br>
+        2. <em>"Không gõ cứng (hardcode) mã màu hex trong component. Bắt buộc dùng các biến Design Tokens khai báo trong <code>src/styles/global.css</code>."</em><br>
+        3. <em>"Màu nền và chữ phải sử dụng hàm <code>light-dark()</code> để hỗ trợ Dark Mode tự động theo <code>color-scheme</code> của hệ thống, không viết script JS toggle theme."</em></p>
+      </div>
+
+      <h2>6. Bài Tập Củng Cố Nhận Thức (Retrieval Practice)</h2>
+      <div class="quiz-section">
+        <div class="quiz-title">Kiểm Tra Nhanh</div>
+
+        <!-- Question 1 -->
+        <div class="quiz-card">
+          <div class="quiz-question">1. Ưu điểm lớn nhất của việc dùng light-dark() so với script JavaScript truyền thống là gì?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="light-dark() được xử lý trực tiếp bởi CSS engine của trình duyệt nên hiển thị chuẩn xác ngay lập tức không có độ trễ.">
+              <input type="radio" name="q1">
+              <span>Đổi màu tức thì theo hệ điều hành mà không cần chạy bất kỳ đoạn mã JS nào.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="light-dark() không làm thay đổi hay tăng kích thước dung lượng hình ảnh trên trang web.">
+              <input type="radio" name="q1">
+              <span>Tự động tăng gấp đôi kích thước của tất cả hình ảnh được hiển thị trên web.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Hàm light-dark() áp dụng cho tất cả màu sắc, không hề bị giới hạn chỉ ở màu đen và trắng.">
+              <input type="radio" name="q1">
+              <span>Chỉ cho phép sử dụng duy nhất hai màu sắc cố định là màu đen và màu trắng.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="quiz-card">
+          <div class="quiz-question">2. Tại sao ta không cần lo lắng về việc xung đột tên class khi viết CSS trong Astro?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Astro tự động thêm data attribute (ví dụ [data-astro-cid-xyz]) vào selector để cô lập phạm vi CSS.">
+              <input type="radio" name="q2">
+              <span>Astro tự động mã hóa phạm vi cục bộ cho thẻ style trong từng component.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro không hề cấm đặt tên class giống nhau giữa các component.">
+              <input type="radio" name="q2">
+              <span>Trình biên dịch Astro cấm người lập trình đặt tên class giống nhau ở dự án.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro không chuyển đổi CSS thành JavaScript inline style.">
+              <input type="radio" name="q2">
+              <span>Trình duyệt tự động chuyển toàn bộ định dạng CSS sang mã nhúng JavaScript.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+      </div>
+
+      <h2>7. Tài Liệu Tham Khảo Chính Thống</h2>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_nesting" target="_blank" rel="noopener">MDN Web Docs: CSS Nesting</a> &mdash; Đặc tả kỹ thuật lồng CSS native.</li>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/light-dark" target="_blank" rel="noopener">MDN Web Docs: light-dark() CSS function</a> &mdash; Cách thức trình duyệt tính toán màu sắc theo bảng màu hệ thống.</li>
+      </ul>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="0002-astro-components-va-content-collections.html">Bài 2: Astro Component &amp; Content</a></div>
+      <div><a href="0004-native-animations-va-motion-principles.html">Bài 4: Native Animations &amp; Motion Principles &rarr;</a></div>
+    </footer>
+  </div>
+</body>
+</html>

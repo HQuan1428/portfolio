@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài 2: Astro Component Model, Routing &amp; Content Collections</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Bài học 0002 &bull; Cấu Trúc &amp; Dữ Liệu</div>
+      <h1>Astro Component Model, Routing &amp; Content Collections</h1>
+      <p>Làm chủ cấu trúc file <code>.astro</code>, cơ chế Layout Slots, file-based routing và quản trị nội dung an toàn kiểu dữ liệu với Content Collections.</p>
+    </header>
+
+    <main>
+      <div class="callout">
+        <p><strong>Mục tiêu kiểm soát Agent:</strong> Hiểu rõ cách Astro tổ chức dữ liệu giúp bạn đặt ra các "hàng rào bảo vệ" (constraints) rõ ràng, ngăn AI Agent tự ý tạo cấu trúc tùy tiện hoặc đưa thư viện ngoài vào quản lý dữ liệu.</p>
+      </div>
+
+      <h2>1. Giải Phẫu Một File <code>.astro</code></h2>
+      <p>Một component Astro được chia thành hai phần rõ rệt bằng hàng rào <code>---</code> (fence):</p>
+
+<pre><code>---
+// 1. COMPONENT SCRIPT (Chạy 100% tại Build Time)
+// Import các component khác, đọc dữ liệu, tính toán logic
+import BaseLayout from '../layouts/Base.astro';
+import { Image } from 'astro:assets';
+
+interface Props {
+  title: string;
+  publishYear?: number;
+}
+
+const { title, publishYear = 2026 } = Astro.props;
+---
+
+&lt;!-- 2. COMPONENT TEMPLATE (HTML thuần túy được xuất ra) --&gt;
+&lt;article class="card"&gt;
+  &lt;h3&gt;{title}&lt;/h3&gt;
+  &lt;span&gt;Năm: {publishYear}&lt;/span&gt;
+  &lt;slot /&gt; &lt;!-- Điểm chèn nội dung con (giống children trong React) --&gt;
+&lt;/article&gt;
+
+&lt;style&gt;
+  /* CSS này được Astro TỰ ĐỘNG SCOPE riêng cho component này */
+  .card {
+    border: 1px solid var(--border);
+    padding: 1rem;
+  }
+&lt;/style&gt;
+</code></pre>
+
+      <div class="callout">
+        <p><strong>Điểm cốt tử cần nhớ:</strong> Biến khai báo trong khối <code>---</code> là mã tĩnh lúc build. Trình duyệt không thể chạy lại các biến này. Vì vậy, không dùng các hàm sự kiện client như <code>onClick</code> trực tiếp trong template của Astro.</p>
+      </div>
+
+      <h2>2. File-Based Routing &amp; Dynamic Paths</h2>
+      <p>Astro sử dụng cơ chế định tuyến dựa trên tên file trong thư mục <code>src/pages/</code>:</p>
+      <ul>
+        <li><code>src/pages/index.astro</code> &rarr; Trang chủ (<code>/</code>).</li>
+        <li><code>src/pages/404.astro</code> &rarr; Trang lỗi không tìm thấy (<code>/404</code>).</li>
+        <li><code>src/pages/projects/[slug].astro</code> &rarr; Trang động chi tiết từng dự án (<code>/projects/du-an-a</code>, <code>/projects/du-an-b</code>).</li>
+      </ul>
+
+      <p>Với các trang tĩnh có tham số động (dynamic routes), hàm <code>getStaticPaths()</code> thông báo cho Astro biết tất cả các URL cần được tạo trước:</p>
+
+<pre><code>---
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+&lt;h1&gt;{entry.data.title}&lt;/h1&gt;
+&lt;Content /&gt;
+</code></pre>
+
+      <h2>3. Content Collections: Trái Tim Quản Lý Nội Dung Dự Án</h2>
+      <p>Trong các dự án thông thường, dev hay để file Markdown rải rác và dùng các hàm đọc file tự do. Astro chuẩn hóa việc này bằng <strong>Content Collections</strong> (định nghĩa tại <code>src/content.config.ts</code>):</p>
+
+<pre><code>import { defineCollection } from 'astro:content';
+import { glob } from 'astro/loaders';
+import { z } from 'astro/zod';
+
+const projects = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
+  schema: ({ image }) => z.object({
+    title: z.string(),
+    summary: z.string(),
+    cover: image(), // Tự động xác thực và tối ưu file ảnh
+    tags: z.array(z.string()),
+    order: z.number(),
+    live: z.string().url().optional(),
+    repo: z.string().url().optional(),
+  }),
+});
+
+export const collections = { projects };
+</code></pre>
+
+      <p>Lợi ích kiến trúc tối cao:</p>
+      <ul>
+        <li><strong>An toàn kiểu dữ liệu (Type-safety):</strong> Nếu bạn hoặc AI Agent thêm một file Markdown thiếu trường <code>title</code> hoặc sai đường dẫn ảnh <code>cover</code>, trình biên dịch Astro sẽ báo lỗi ngay lập tức lúc build.</li>
+        <li><strong>Bộ tối ưu ảnh tự động (<code>astro:assets</code>):</strong> Bằng cách dùng <code>image()</code> trong schema, ảnh cover của bạn tự động được resize, chuyển đổi thành định dạng hiện đại (WebP) và thêm sẵn thuộc tính <code>width</code>/<code>height</code> chống hiện tượng giật layout (CLS).</li>
+      </ul>
+
+      <h2>4. Nguyên Tắc Điều Khiển Agent Cho Module Này</h2>
+      <div class="callout">
+        <p><strong>Chỉ thị cho AI Agent:</strong><br>
+        1. <em>"Không được cài thư viện quản lý state hay router ngoài (như React Router, Redux). Dùng 100% file-based routing của Astro."</em><br>
+        2. <em>"Mọi dữ liệu case study phải đặt trong <code>src/content/projects/*.md</code> và tuân thủ schema Zod đã định nghĩa trong <code>content.config.ts</code>."</em><br>
+        3. <em>"Mọi hình ảnh dự án phải hiển thị bằng component <code>&lt;Image /&gt;</code> từ <code>astro:assets</code>, tuyệt đối không dùng thẻ <code>&lt;img&gt;</code> trần."</em></p>
+      </div>
+
+      <h2>5. Bài Tập Củng Cố Nhận Thức (Retrieval Practice)</h2>
+      <div class="quiz-section">
+        <div class="quiz-title">Kiểm Tra Nhanh</div>
+
+        <!-- Question 1 -->
+        <div class="quiz-card">
+          <div class="quiz-question">1. Khối mã bên trong dấu rào chắn ba gạch (---) của component Astro sẽ chạy ở đâu?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Component script của Astro chỉ thực thi trên môi trường build của bạn để sinh ra mã HTML tĩnh.">
+              <input type="radio" name="q1">
+              <span>Chỉ chạy ở thời điểm build và không xuất hiện trên trình duyệt.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Mã trong fence không được gửi xuống trình duyệt người dùng nên không chạy phía client.">
+              <input type="radio" name="q1">
+              <span>Chỉ chạy trên trình duyệt người dùng sau khi tải xong toàn trang.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro mặc định xuất file tĩnh (SSG), không bắt buộc phải có máy chủ backend chạy liên tục.">
+              <input type="radio" name="q1">
+              <span>Chạy liên tục trên máy chủ cơ sở dữ liệu mỗi khi có request.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="quiz-card">
+          <div class="quiz-question">2. Việc khai báo schema Zod trong content.config.ts mang lại lợi ích quan trọng nhất nào?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Schema Zod phát hiện ngay các lỗi thiếu trường thông tin bắt buộc hoặc sai định dạng ảnh lúc build.">
+              <input type="radio" name="q2">
+              <span>Ngăn chặn lỗi sai sót cấu trúc bài viết ngay tại thời điểm build.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Schema dùng để kiểm tra dữ liệu, không liên quan tới tốc độ mạng internet của người dùng.">
+              <input type="radio" name="q2">
+              <span>Tăng tốc độ đường truyền mạng của người dùng khi truy cập vào web.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Astro đã gửi 0 JS mặc định từ đầu, việc có schema không dùng để xóa bỏ JavaScript.">
+              <input type="radio" name="q2">
+              <span>Tự động xóa bỏ toàn bộ mã JavaScript thừa của toàn bộ trang web.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+      </div>
+
+      <h2>6. Tài Liệu Tham Khảo Chính Thống</h2>
+      <ul>
+        <li><a href="https://docs.astro.build/en/guides/content-collections/" target="_blank" rel="noopener">Astro Content Collections Guide</a> &mdash; Hướng dẫn định nghĩa loader và schema Zod.</li>
+        <li><a href="https://docs.astro.build/en/guides/images/" target="_blank" rel="noopener">Astro Images Guide</a> &mdash; Cách thức <code>astro:assets</code> tự động nén ảnh tối ưu.</li>
+      </ul>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="0001-kien-truc-zero-js-va-astro.html">Bài 1: Kiến Trúc Zero-JS</a></div>
+      <div><a href="0003-modern-css-tokens-nesting-light-dark.html">Bài 3: Modern CSS &amp; Dark Mode &rarr;</a></div>
+    </footer>
+  </div>
+</body>
+</html>

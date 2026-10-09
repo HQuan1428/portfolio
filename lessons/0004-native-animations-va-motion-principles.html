@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bài 4: Native Browser Animations &amp; Motion Principles</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <script src="../assets/quiz.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="lesson-meta">Bài học 0004 &bull; Chuyển Động &amp; Tương Tác</div>
+      <h1>Native Browser Animations &amp; Motion Principles</h1>
+      <p>Tạo hiệu ứng chuyển động đẳng cấp, mượt mà ngoài main thread bằng 100% CSS native: <code>@starting-style</code>, Cross-document View Transitions, Scroll-driven animations và chuẩn tiếp cận WCAG.</p>
+    </header>
+
+    <main>
+      <div class="callout">
+        <p><strong>Mục tiêu kiểm soát Agent:</strong> AI Agent thường có phản xạ tự động cài đặt các thư viện nặng như GSAP, Motion hoặc Lenis (thêm từ 20&ndash;40 kB JS). Nắm vững bài này giúp bạn chỉ thị cho Agent thực hiện toàn bộ chuyển động bằng CSS native với hiệu năng 60&ndash;120 FPS.</p>
+      </div>
+
+      <h2>1. Vì Sao Nói "Không" Với Thư Viện Animation JavaScript?</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Tiêu chí</th>
+            <th>Thư viện JS (GSAP, Framer Motion)</th>
+            <th>Native Browser CSS (Dự án chọn)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Dung lượng Bundle</strong></td>
+            <td>Thêm 18&ndash;35 kB JavaScript tải qua mạng.</td>
+            <td><strong>0 kB</strong> JavaScript (tận dụng engine sẵn có của trình duyệt).</td>
+          </tr>
+          <tr>
+            <td><strong>Luồng xử lý (Threading)</strong></td>
+            <td>Chạy trên Main Thread. Khi trình duyệt bận parse dữ liệu, animation sẽ bị giật khung hình.</td>
+            <td>Chạy trực tiếp trên <strong>Compositor Thread (GPU)</strong>, luôn mượt mà 60&ndash;120 FPS kể cả khi main thread bận rộn.</td>
+          </tr>
+          <tr>
+            <td><strong>Trải nghiệm Cuộn</strong></td>
+            <td>Lenis can thiệp vào cuộn (scroll-jacking), dễ gây khó chịu tiền đình (vestibular trigger).</td>
+            <td>Giữ nguyên cuộn native của hệ điều hành, mượt mà và tôn trọng người dùng.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>2. Ba Vũ Khí Animation Native Trọng Yếu</h2>
+
+      <h3>A. Hero Reveal Với <code>@starting-style</code> (Baseline Newly Available)</h3>
+      <p>Trước đây, muốn một phần tử fade-in khi trang vừa tải, dev phải dùng JavaScript hoặc <code>@keyframes</code> phức tạp. Nay CSS Transition đã hỗ trợ trạng thái khởi tạo:</p>
+
+<pre><code>/* Phần tử Hero tự động trượt lên và hiện rõ khi xuất hiện trong DOM */
+.hero &gt; * {
+  transition: opacity var(--dur-med) var(--ease-out),
+              translate var(--dur-med) var(--ease-out);
+
+  /* Trạng thái bắt đầu trước khi render: mờ đục và dịch xuống 16px */
+  @starting-style {
+    opacity: 0;
+    translate: 0 16px;
+  }
+}
+
+.hero &gt; :nth-child(2) { transition-delay: 80ms; }
+.hero &gt; :nth-child(3) { transition-delay: 160ms; }
+</code></pre>
+
+      <h3>B. Chuyển Trang Mượt Mà Với Cross-Document View Transitions</h3>
+      <p>Không cần SPA hay React Router, chỉ cần một dòng CSS trong <code>global.css</code> ở cả trang nguồn và trang đích:</p>
+
+<pre><code>@view-transition {
+  navigation: auto;
+}
+</code></pre>
+      <p>Khi người dùng bấm vào link dự án, trình duyệt tự động chụp ảnh trang cũ và tạo hiệu ứng hòa tan (cross-fade) sang trang mới. Đặc biệt, bạn có thể tạo hiệu ứng <strong>Shared Element Transition</strong> (ảnh thumbnail ở trang chủ biến hình thành ảnh hero ở trang chi tiết) chỉ bằng cách đặt cùng một <code>view-transition-name</code>:</p>
+
+<pre><code>&lt;!-- Card ở index.astro --&gt;
+&lt;Image src={p.cover} style={`view-transition-name: cover-${p.id}`} /&gt;
+
+&lt;!-- Hero ở projects/[slug].astro --&gt;
+&lt;Image src={entry.cover} style={`view-transition-name: cover-${entry.id}`} /&gt;
+</code></pre>
+
+      <h3>C. Cuộn Tới Đâu Hiện Tới Đó: Scroll-Driven Animations</h3>
+      <p>Thay vì viết sự kiện <code>window.addEventListener('scroll', ...)</code> làm nặng máy, dùng thuộc tính <code>animation-timeline: view()</code>:</p>
+
+<pre><code>/* Progressive Enhancement: Chỉ áp dụng nếu trình duyệt hỗ trợ */
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: reveal-fade linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 30%;
+  }
+
+  @keyframes reveal-fade {
+    from {
+      opacity: 0;
+      translate: 0 24px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+}
+</code></pre>
+      <div class="callout">
+        <p><strong>Chiến lược Progressive Enhancement:</strong> Tính năng này hiện có trên Chrome/Edge/Safari (Firefox đang trong tiến trình hoàn thiện). Bọc trong <code>@supports</code> đảm bảo trên Firefox trang web vẫn hiển thị đầy đủ 100% nội dung bình thường mà không hề có lỗi.</p>
+      </div>
+
+      <h2>3. Quy Chuẩn Chuyển Động Chuyên Nghiệp (Motion Tokens &amp; WCAG)</h2>
+      <ul>
+        <li><strong>Quy tắc GPU Only:</strong> Chỉ animate hai thuộc tính duy nhất: <code>opacity</code> và <code>transform</code> (hoặc <code>translate</code>). Tuyệt đối không bao giờ animate <code>width</code>, <code>height</code>, <code>top</code>, <code>left</code>, <code>margin</code> vì chúng kích hoạt tính toán lại layout (reflow) làm giật lag và tăng điểm lỗi CLS.</li>
+        <li><strong>Thời lượng (Duration):</strong> Giữ từ <strong>150ms &ndash; 400ms</strong>. Animation trong portfolio chỉ để định hướng mắt người nhìn, không bắt nhà tuyển dụng phải ngồi chờ đợi.</li>
+        <li><strong>Chuẩn Tiếp Cận (WCAG 2.3.3):</strong> Toàn bộ hiệu ứng phải được bọc trong bộ lọc tôn trọng người dùng:
+<pre><code>@media (prefers-reduced-motion: no-preference) {
+  /* Toàn bộ animation chỉ kích hoạt ở đây */
+}
+</code></pre>
+        </li>
+      </ul>
+
+      <h2>4. Nguyên Tắc Điều Khiển Agent Cho Module Này</h2>
+      <div class="callout">
+        <p><strong>Chỉ thị cho AI Agent:</strong><br>
+        1. <em>"Tuyệt đối không cài GSAP, Framer Motion hay Lenis. Toàn bộ hiệu ứng chuyển động phải sử dụng 100% CSS native."</em><br>
+        2. <em>"Chỉ được animate hai thuộc tính: <code>opacity</code> và <code>translate</code>. Không animate kích thước hoặc khoảng cách làm giật layout."</em><br>
+        3. <em>"Mọi animation phải nằm trong <code>@media (prefers-reduced-motion: no-preference)</code> và các tính năng scroll-timeline phải bọc trong <code>@supports</code>."</em></p>
+      </div>
+
+      <h2>5. Bài Tập Củng Cố Nhận Thức (Retrieval Practice)</h2>
+      <div class="quiz-section">
+        <div class="quiz-title">Kiểm Tra Nhanh</div>
+
+        <!-- Question 1 -->
+        <div class="quiz-card">
+          <div class="quiz-question">1. Tại sao ta chỉ nên animate opacity và transform (translate) thay vì width hay height?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Opacity và transform chạy trên GPU compositor thread, hoàn toàn không gây tính toán lại layout giúp trang web mượt 60 FPS.">
+              <input type="radio" name="q1">
+              <span>Chạy trên bộ xử lý đồ họa giúp tránh gây hiện tượng giật khung hình.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Trình duyệt vẫn hỗ trợ animate width/height nhưng chúng rất nặng nề vì gây reflow liên tục.">
+              <input type="radio" name="q1">
+              <span>Trình duyệt hiện đại đã cấm hoàn toàn việc thay đổi kích thước phần tử.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="Tất cả các thuộc tính CSS đều có thể viết được trong file stylesheet, không giới hạn.">
+              <input type="radio" name="q1">
+              <span>Hai thuộc tính này là các thuộc tính duy nhất viết được trong file CSS.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="quiz-card">
+          <div class="quiz-question">2. Việc bọc animation-timeline trong @supports mang lại giá trị kiến trúc quan trọng nào?</div>
+          <div class="quiz-options">
+            <label class="quiz-option" data-correct="true" data-explanation="Trên trình duyệt chưa hỗ trợ (như Firefox hiện tại), trang web vẫn hiển thị tĩnh hoàn hảo theo đúng nguyên tắc Progressive Enhancement.">
+              <input type="radio" name="q2">
+              <span>Đảm bảo nội dung luôn hiển thị trọn vẹn trên những trình duyệt chưa có.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="@supports chỉ là câu lệnh điều kiện CSS, không thể tự cài thêm tính năng vào engine trình duyệt.">
+              <input type="radio" name="q2">
+              <span>Ép buộc các trình duyệt cũ phải tự động cập nhật tính năng mới ngay lập tức.</span>
+            </label>
+            <label class="quiz-option" data-correct="false" data-explanation="@supports không liên quan tới tốc độ tải file của nhà mạng internet.">
+              <input type="radio" name="q2">
+              <span>Giảm dung lượng đường truyền mạng khi người dùng truy cập vào trang web.</span>
+            </label>
+          </div>
+          <div class="quiz-feedback"></div>
+        </div>
+      </div>
+
+      <h2>6. Tài Liệu Tham Khảo Chính Thống</h2>
+      <ul>
+        <li><a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@starting-style" target="_blank" rel="noopener">MDN Web Docs: @starting-style</a> &mdash; Hướng dẫn kích hoạt CSS transition ngay khi phần tử render.</li>
+        <li><a href="https://developer.chrome.com/docs/web-platform/view-transitions/cross-document" target="_blank" rel="noopener">Chrome for Developers: Cross-document View Transitions</a> &mdash; Chuyển trang mượt mà cho website đa trang (MPA).</li>
+        <li><a href="https://developer.chrome.com/docs/css-ui/scroll-driven-animations" target="_blank" rel="noopener">Chrome for Developers: Scroll-driven animations</a> &mdash; Tạo hiệu ứng cuộn trang ngoài main-thread.</li>
+      </ul>
+    </main>
+
+    <footer>
+      <div>&larr; <a href="0003-modern-css-tokens-nesting-light-dark.html">Bài 3: Modern Plain CSS</a></div>
+      <div><a href="0005-web-vitals-accessibility-va-wcag.html">Bài 5: Core Web Vitals &amp; WCAG 2.2 &rarr;</a></div>
+    </footer>
+  </div>
+</body>
+</html>
