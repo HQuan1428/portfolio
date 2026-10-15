@@ -1,0 +1,26 @@
+---
+import { skills, experience } from '../data/site';
+---
+<section id="experience" class="reveal" aria-labelledby="experience-title">
+  <h2 id="experience-title">Skills &amp; Experience</h2>
+  <h3>Skills</h3>
+  <ul class="tags">{skills.map((s) => <li>{s}</li>)}</ul>
+  <h3>Experience</h3>
+  <ol class="jobs">
+    {experience.map((e) => (
+      <li>
+        <p class="head"><strong>{e.role}</strong> · {e.org} <span>{e.period}</span></p>
+        <p>{e.summary}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<style>
+  .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; list-style: none; }
+  .tags li { padding: 0.25rem 0.75rem; border: 1px solid var(--border); border-radius: 999px; }
+  .jobs { padding: 0; list-style: none; }
+  .jobs li + li { margin-top: 1.5rem; }
+  .jobs p { margin: 0; }
+  .head span { color: var(--muted); }
+</style>

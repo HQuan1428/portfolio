@@ -1,0 +1,19 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '../data/site';
+import { asset } from '../lib/assets';
+---
+<section id="hero" aria-labelledby="hero-title">
+  <div class="hero-enter">
+    <Image class="avatar" src={asset(site.avatar)} alt={site.avatarAlt} width={160} height={160} format="webp" loading="eager" />
+    <h1 id="hero-title">{site.name}</h1>
+    <p>{site.tagline}</p>
+  </div>
+</section>
+
+<style>
+  section { min-height: 70vh; display: grid; place-items: center; text-align: center; }
+  .avatar { border-radius: 50%; margin-inline: auto; }
+  h1 { font-size: clamp(2.25rem, 7vw, 4rem); margin: 1rem 0 0.25rem; line-height: 1.1; }
+  p { font-size: 1.25rem; color: var(--muted); margin: 0; }
+</style>

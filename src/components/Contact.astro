@@ -1,0 +1,15 @@
+---
+import { contact } from '../data/site';
+---
+<section id="contact" class="reveal" aria-labelledby="contact-title">
+  <h2 id="contact-title">Contact</h2>
+  <ul>
+    <li><a href={contact.email}>Email</a></li>
+    <li><a href={contact.github}>GitHub</a></li>
+    <li><a href={contact.linkedin}>LinkedIn</a></li>
+  </ul>
+</section>
+
+<style>
+  ul { display: flex; flex-wrap: wrap; gap: 1.5rem; padding: 0; list-style: none; font-size: 1.125rem; }
+</style>
