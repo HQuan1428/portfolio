@@ -1,12 +1,20 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { site, items, contact } from '../src/data/site.ts';
 
 // Seam: the built page. Run `astro build` first (npm test does).
 const html = readFileSync(new URL('../dist/index.html', import.meta.url), 'utf8');
 
-test('ships zero JavaScript', () => {
-  assert.doesNotMatch(html, /<script/i);
+/** HTML of the element with this id, up to the next item. */
+const itemHtml = (id) => html.split(`id="${id}"`)[1]?.split('class="item"')[0] ?? '';
+/** Text as Astro escapes it in the HTML. */
+const esc = (s) => s.replaceAll('&', '&amp;').replaceAll("'", '&#39;').replaceAll('"', '&quot;');
+
+test('ships exactly one inline script and no external scripts', () => {
+  const scripts = html.match(/<script[^>]*>/gi) ?? [];
+  assert.equal(scripts.length, 1);
+  assert.doesNotMatch(scripts[0], /\ssrc=/);
 });
 
 test('has no external stylesheet and inlines CSS', () => {
@@ -14,31 +22,31 @@ test('has no external stylesheet and inlines CSS', () => {
   assert.match(html, /<style/i);
 });
 
-test('follows OS light/dark theme', () => {
-  assert.match(html, /color-scheme:\s*light dark/);
-  assert.match(html, /light-dark\(/);
-});
-
-test('renders all sections with landmarks', () => {
-  assert.match(html, /<header/);
-  assert.match(html, /<nav/);
+test('every item renders a summary and a detail block', () => {
   assert.match(html, /<main/);
-  for (const id of ['hero', 'about', 'experience', 'projects', 'contact']) {
-    assert.match(html, new RegExp(`<section[^>]+id="${id}"`), id);
+  for (const item of items) {
+    const h = itemHtml(item.id);
+    assert.match(h, /class="summary/, item.id);
+    assert.match(h, /class="detail/, item.id);
+    assert.ok(h.includes(esc(item.title)), item.id);
+    assert.ok(h.includes(esc(item.summary)), item.id);
+    for (const p of item.detail ?? []) assert.ok(h.includes(esc(p)), item.id);
   }
 });
 
-test('nav links to each section', () => {
-  for (const id of ['about', 'experience', 'projects', 'contact']) {
-    assert.match(html, new RegExp(`<a[^>]+href="#${id}"`), id);
+test('hero is first and nav links to each labelled item', () => {
+  assert.equal(items[0].id, 'hero');
+  assert.match(html, /<h1[^>]*>[^<]*Nguyễn Hải Quân/);
+  for (const item of items.filter((i) => i.nav)) {
+    assert.match(html, new RegExp(`<a[^>]+href="#${item.id}"`), item.id);
   }
 });
 
-test('renders content from site data', async () => {
-  const { site, projects, contact } = await import('../src/data/site.ts');
-  assert.ok(html.includes(site.name));
-  assert.ok(html.includes(site.tagline));
-  for (const p of projects) assert.ok(html.includes(p.title), p.title);
+test('has a swap button', () => {
+  assert.match(html, /<button[^>]+class="swap"[^>]+aria-label="[^"]+"/);
+});
+
+test('renders contact links', () => {
   for (const href of Object.values(contact)) assert.ok(html.includes(href), href);
 });
 
@@ -52,8 +60,7 @@ test('images are webp, lazy (except avatar), with alt', () => {
   }
 });
 
-test('has title, description and Open Graph metadata', async () => {
-  const { site } = await import('../src/data/site.ts');
+test('has title, description and Open Graph metadata', () => {
   assert.match(html, new RegExp(`<title>${site.title}</title>`));
   assert.match(html, /<meta name="description" content="[^"]+"/);
   for (const p of ['og:title', 'og:description', 'og:type', 'og:url', 'og:image']) {

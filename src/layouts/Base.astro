@@ -17,6 +17,69 @@ const ogImage = new URL('og.png', site.url).href;
     <meta property="og:url" content={site.url} />
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>
+      // Progressive enhancement: without this script the page stays one column (detail above summary).
+      const root = document.documentElement;
+      root.classList.add('js');
+      try { if (localStorage.getItem('swapped') === '1') root.classList.add('swapped'); } catch {}
+
+      addEventListener('DOMContentLoaded', () => {
+        const items = [...document.querySelectorAll('.item')];
+        const swap = document.querySelector('.swap');
+        const wide = matchMedia('(min-width: 1000px)');
+        const still = matchMedia('(prefers-reduced-motion: reduce)');
+
+        swap.setAttribute('aria-pressed', root.classList.contains('swapped'));
+        swap.addEventListener('click', () => {
+          const on = root.classList.toggle('swapped');
+          swap.setAttribute('aria-pressed', on);
+          try { localStorage.setItem('swapped', on ? '1' : '0'); } catch {}
+        });
+
+        // f = fractional index of the summary at the viewport centre; each item is styled by its distance s from it.
+        let queued = false;
+        function update() {
+          queued = false;
+          const mid = innerHeight / 2;
+          const c = items.map((el) => {
+            const r = el.querySelector('.summary').getBoundingClientRect();
+            return r.top + r.height / 2;
+          });
+          let f = 0;
+          if (mid >= c[c.length - 1]) f = c.length - 1;
+          else if (mid > c[0]) {
+            const i = c.findIndex((_, k) => mid < c[k + 1]);
+            f = i + (mid - c[i]) / (c[i + 1] - c[i]);
+          }
+          if (still.matches) f = Math.round(f);
+          items.forEach((el, j) => {
+            const s = j - f;
+            const detail = el.querySelector('.detail');
+            if (!wide.matches) {
+              el.removeAttribute('style');
+              detail.inert = false;
+              return;
+            }
+            const o = Math.max(0, 1 - 2 * Math.abs(s));
+            el.style.setProperty('--s', s.toFixed(3));
+            el.style.setProperty('--o', o.toFixed(3));
+            el.style.setProperty('--a', Math.max(0, 1 - Math.abs(s)).toFixed(3));
+            detail.inert = o === 0;
+          });
+        }
+        const queue = () => {
+          if (!queued) {
+            queued = true;
+            requestAnimationFrame(update);
+          }
+        };
+        addEventListener('scroll', queue, { passive: true });
+        addEventListener('resize', queue);
+        wide.addEventListener('change', queue);
+        still.addEventListener('change', queue);
+        update();
+      });
+    </script>
   </head>
   <body>
     <slot />
@@ -25,56 +88,101 @@ const ogImage = new URL('og.png', site.url).href;
 
 <style is:global>
   :root {
-    color-scheme: light dark;
-    --bg: light-dark(#fbfbfd, #0f1115);
-    --fg: light-dark(#1b1d22, #e8e9ee);
-    --muted: light-dark(#5a5f6b, #a0a5b2);
-    --accent: light-dark(#3b4fe0, #8c9bff);
-    --card: light-dark(#ffffff, #181b22);
-    --border: light-dark(#e3e5ea, #2a2e38);
-    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    line-height: 1.6;
+    --cream: #faf8f5;
+    --ink: #1f2024;
+    --muted: #6b6f78;
+    --accent: #2f7d9a;
+    --dark: #202226;
+    --on-dark: #e6e6e9;
+    --accent-dark: #7fd4f0;
+    --serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
+    --sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    color-scheme: light;
+    background: var(--cream);
+    color: var(--ink);
+    font: 1.0625rem/1.7 var(--serif);
   }
   *, *::before, *::after { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--fg); }
+  body { margin: 0; }
   html { scroll-behavior: smooth; }
-  a { color: var(--accent); transition: color 0.2s; }
-  a:hover { color: var(--fg); }
+  a { color: var(--accent); text-underline-offset: 3px; transition: color 0.2s; }
+  a:hover { color: var(--ink); }
+  .detail a { color: var(--accent-dark); }
+  .detail a:hover { color: var(--on-dark); }
   :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
   img { max-width: 100%; height: auto; display: block; }
-  main > section {
-    max-width: 52rem;
-    margin-inline: auto;
-    padding: 4rem 1rem;
-    scroll-margin-top: 4rem;
-  }
-  h2 { font-size: 1.75rem; margin-block: 0 1.5rem; }
+  .swap { display: none; }
 
-  /* Motion is progressive enhancement: without support or with reduced motion, content stays static and visible. */
+  /* Split screen: desktop with JS. Detail panels are fixed and cross-faded by --o/--s set from scroll. */
+  @media (min-width: 1000px) {
+    .js body::before {
+      content: '';
+      position: fixed;
+      inset: 0 50% 0 0;
+      z-index: -1;
+      background: var(--dark);
+      transition: translate 0.5s ease;
+    }
+    .js.swapped body::before { translate: 100% 0; }
+    .js .items { padding: 40vh 0 40vh 50%; transition: padding 0.5s ease; }
+    .js.swapped .items { padding-inline: 0 50%; }
+    .js .item + .item { margin-top: 35vh; }
+    .js .summary {
+      padding: 0 5vw;
+      opacity: calc(0.45 + 0.55 * var(--a, 0));
+      border-left: 3px solid rgb(47 125 154 / var(--a, 0));
+    }
+    .js .detail {
+      position: fixed;
+      top: 20vh;
+      left: 0;
+      width: 50vw;
+      max-height: 60vh;
+      overflow: auto;
+      padding: 0 5vw;
+      background: none;
+      opacity: var(--o, 0);
+      translate: 0 calc(var(--s, 0) * 3rem);
+      transition: left 0.5s ease;
+    }
+    .js.swapped .detail { left: 50vw; }
+    .js .swap {
+      display: grid;
+      place-items: center;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+      width: 2.75rem;
+      height: 2.75rem;
+      border: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 1.25rem;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    /* Larger invisible hover target around the hidden button. */
+    .js .swap::before { content: ''; position: absolute; inset: -2rem; }
+    .js .swap:hover, .js .swap:focus-visible { opacity: 1; }
+  }
+
   @media (prefers-reduced-motion: no-preference) {
-    @supports (animation-timeline: view()) {
-      .reveal {
-        animation: reveal linear both;
-        animation-timeline: view();
-        animation-range: entry 0% cover 30%;
-      }
+    .item:first-child .summary > *, .item:first-child .detail > * {
+      animation: enter 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
     }
-    .hero-enter > * {
-      animation: hero-in 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-    }
-    .hero-enter > :nth-child(2) { animation-delay: 0.12s; }
-    .hero-enter > :nth-child(3) { animation-delay: 0.24s; }
+    .item:first-child :is(.summary, .detail) > :nth-child(2) { animation-delay: 0.12s; }
+    .item:first-child :is(.summary, .detail) > :nth-child(3) { animation-delay: 0.24s; }
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, *::before, *::after { transition: none !important; }
   }
-  @keyframes reveal {
-    from { opacity: 0; translate: 0 2rem; }
+  @keyframes enter {
+    from { opacity: 0; translate: 0 1.5rem; }
     to { opacity: 1; translate: 0 0; }
-  }
-  @keyframes hero-in {
-    from { opacity: 0; translate: 0 1.5rem; scale: 0.97; }
-    to { opacity: 1; translate: 0 0; scale: 1; }
   }
 </style>

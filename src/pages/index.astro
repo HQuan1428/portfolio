@@ -1,19 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
-import Nav from '../components/Nav.astro';
-import Hero from '../components/Hero.astro';
-import About from '../components/About.astro';
-import Experience from '../components/Experience.astro';
-import Projects from '../components/Projects.astro';
-import Contact from '../components/Contact.astro';
+import Item from '../components/Item.astro';
+import { items } from '../data/site';
+
+const nav = items.filter((i) => i.nav);
 ---
 <Base>
-  <Nav />
-  <main>
-    <Hero />
-    <About />
-    <Experience />
-    <Projects />
-    <Contact />
+  <main class="items">
+    {items.map((item, i) => <Item item={item} first={i === 0} nav={nav} />)}
   </main>
+  <button class="swap" type="button" aria-label="Swap columns">⇄</button>
 </Base>
