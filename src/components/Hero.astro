@@ -52,10 +52,8 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
     display: flex;
     flex-direction: column;
     min-height: calc(100svh - var(--nav-h));
-    /* Equal space above the intro, between intro and stack, and below the stack. */
-    justify-content: space-evenly;
     gap: 2rem;
-    padding-block: 0;
+    padding-block: clamp(2rem, 8vh, 5rem) 0;
   }
   .intro { display: grid; grid-template-columns: minmax(0, 32rem) auto 1fr; gap: 3rem; align-items: center; }
   .avatar { justify-self: end; }
@@ -111,6 +109,9 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
   .cta:hover { color: #fff; box-shadow: 0 0 32px rgb(61 143 0 / 0.85); translate: 0 -2px; }
   .avatar { width: min(460px, 32vw); aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
   .stack h2 { font: 400 0.95rem var(--mono); color: var(--fg); margin: 0 0 1.25rem; }
+  /* Stack fills the space under the intro and centres itself in it. */
+  /* padding-bottom offsets the heading + section gap above the logos so the logo row itself is centred. */
+  .stack { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-bottom: 4.25rem; }
   /* Two identical lists slide left by one list width, looping seamlessly. */
   .marquee {
     display: flex;
