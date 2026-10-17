@@ -1,0 +1,10 @@
+---
+interface Props {
+  /** Year-month, e.g. '2026-04'. */
+  start: string;
+  end: string;
+}
+const { start, end } = Astro.props;
+const label = (ym: string) => `${ym.slice(5)}/${ym.slice(0, 4)}`;
+---
+<time datetime={start}>{label(start)}</time> — <time datetime={end}>{label(end)}</time>

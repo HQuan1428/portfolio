@@ -1,0 +1,27 @@
+---
+import { Image } from 'astro:assets';
+import { projects } from '../data/site';
+import { asset } from '../lib/assets';
+---
+{projects.length > 0 && (
+  <section id="work" aria-labelledby="work-title">
+    <h2 id="work-title" class="reveal">Recent work</h2>
+    <ul class="grid cards">
+      {projects.map((p) => (
+        <li class="card reveal">
+          <Image src={asset(p.image)} alt={p.imageAlt} width={600} format="webp" loading="lazy" />
+          <h3>{p.title}</h3>
+          <p>{p.description}</p>
+          <ul class="tags">{p.tech.map((t) => <li>{t}</li>)}</ul>
+          <p class="links">{p.links.map((l) => <a href={l.href}>{l.label}</a>)}</p>
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
+<style>
+  img { border-radius: 4px; margin-bottom: 1rem; }
+  h3 { margin: 0 0 0.5rem; }
+  .links { display: flex; gap: 1.25rem; margin: 1rem 0 0; }
+</style>

@@ -1,0 +1,22 @@
+---
+import { skills } from '../data/site';
+---
+<section id="skills" aria-labelledby="skills-title">
+  <h2 id="skills-title" class="reveal">Skills</h2>
+  <ul class="groups cards">
+    {skills.map((g) => (
+      <li class="card reveal">
+        <h3>{g.title}</h3>
+        <ul class="points">{g.points.map((p) => <li>{p}</li>)}</ul>
+        {g.tags && <ul class="tags">{g.tags.map((t) => <li>{t}</li>)}</ul>}
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  h3 { margin: 0 0 1rem; }
+  .points { margin: 0 0 1.25rem; padding-left: 1.1rem; }
+  .points li + li { margin-top: 0.5rem; }
+  .points li::marker { color: var(--accent-hi); }
+</style>

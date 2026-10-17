@@ -1,0 +1,21 @@
+---
+import Base from '../layouts/Base.astro';
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Experience from '../components/Experience.astro';
+import Skills from '../components/Skills.astro';
+import Work from '../components/Work.astro';
+import Contact from '../components/Contact.astro';
+import { profile } from '../data/site';
+---
+<Base>
+  <Header />
+  <main id="main" tabindex="-1">
+    <Hero />
+    <Experience />
+    <Skills />
+    <Work />
+    <Contact />
+  </main>
+  <footer>© {new Date().getFullYear()} <span lang="vi">{profile.name}</span></footer>
+</Base>

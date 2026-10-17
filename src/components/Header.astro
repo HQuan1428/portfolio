@@ -1,0 +1,103 @@
+---
+import Icon from './Icon.astro';
+import { profile, contact, projects } from '../data/site';
+
+const links = [
+  { href: '#home', label: 'Home' },
+  { href: '#experience', label: 'Experience' },
+  { href: '#skills', label: 'Skills' },
+  ...(projects.length ? [{ href: '#work', label: 'Recent work' }] : []),
+];
+const socials = [
+  { href: contact.linkedin, label: 'LinkedIn', icon: 'linkedin' },
+  { href: contact.github, label: 'GitHub', icon: 'github' },
+  { href: contact.email, label: 'Email', icon: 'mail' },
+] as const;
+---
+<header>
+  <nav aria-label="Main">
+    <a class="brand" href="#home" lang="vi">{profile.name}</a>
+    <button class="menu" type="button" aria-controls="nav-links" aria-expanded="false" aria-label="Menu">
+      <span></span>
+    </button>
+    <ul id="nav-links" class="links">
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      <li class="mobile-only"><a href="#contact">Get In Touch</a></li>
+    </ul>
+    <ul class="socials">
+      {socials.map((s) => <li><a href={s.href} aria-label={s.label}><Icon name={s.icon} /></a></li>)}
+    </ul>
+    <a class="nav-cta" href="#contact">Get In Touch</a>
+  </nav>
+</header>
+
+<style>
+  header { position: sticky; top: 0; z-index: 10; }
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 1rem 2.5rem;
+    min-height: var(--nav-h);
+    padding: 0.75rem var(--gutter);
+    background: var(--panel);
+    flex-wrap: wrap;
+  }
+  .brand { display: none; color: var(--fg); font: 700 1.1rem var(--display); text-decoration: none; }
+  ul { display: flex; gap: 0.5rem 2.5rem; margin: 0; padding: 0; list-style: none; }
+  .links { margin-right: auto; }
+  .links a { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+  .links a:hover, .links a[aria-current='true'] { color: var(--fg); }
+  .mobile-only { display: none; }
+  .socials { gap: 1.5rem; }
+  .socials a { color: var(--muted); display: grid; place-items: center; min-width: 24px; min-height: 24px; }
+  .socials a:hover { color: var(--fg); }
+  .nav-cta {
+    padding: 0.55rem 1.25rem;
+    background: var(--accent);
+    border: 1px solid var(--accent-hi);
+    border-radius: 4px;
+    color: var(--on-accent);
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0 0 14px rgb(61 143 0 / 0.45);
+    transition: box-shadow 0.2s;
+  }
+  .nav-cta:hover { color: var(--on-accent); box-shadow: 0 0 24px rgb(61 143 0 / 0.8); }
+  .menu { display: none; }
+
+  @media (max-width: 860px) {
+    .brand { display: block; flex: 1; }
+    .links { flex-basis: 100%; order: 3; flex-direction: column; gap: 0.75rem; padding-block: 0.5rem; margin: 0; }
+    .mobile-only { display: list-item; }
+    .nav-cta { display: none; }
+    .socials { gap: 1rem; }
+    /* Menu collapses only when JS can open it again. */
+    :global(.js) .menu {
+      display: grid;
+      place-items: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: none;
+      border: 1px solid var(--control);
+      border-radius: 6px;
+      cursor: pointer;
+      order: 2;
+    }
+    .menu span, .menu span::before, .menu span::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--fg);
+      position: relative;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .menu span::before, .menu span::after { content: ''; position: absolute; }
+    .menu span::before { top: -6px; }
+    .menu span::after { top: 6px; }
+    .menu[aria-expanded='true'] span { background: transparent; }
+    .menu[aria-expanded='true'] span::before { transform: translateY(6px) rotate(45deg); }
+    .menu[aria-expanded='true'] span::after { transform: translateY(-6px) rotate(-45deg); }
+    :global(.js) .menu[aria-expanded='false'] ~ .links { display: none; }
+  }
+</style>

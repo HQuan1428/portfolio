@@ -1,0 +1,137 @@
+---
+import '@fontsource/raleway/700.css';
+import '@fontsource/raleway/800.css';
+import '@fontsource/ibm-plex-mono/400.css';
+import '@fontsource/ibm-plex-mono/700.css';
+import { profile } from '../data/site';
+
+const ogImage = new URL('og.png', profile.url).href;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{profile.title}</title>
+    <meta name="description" content={profile.description} />
+    <link rel="canonical" href={profile.url} />
+    <meta property="og:title" content={profile.title} />
+    <meta property="og:description" content={profile.description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={profile.url} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>
+      // Progressive enhancement: without this script the nav stays expanded and nothing is hidden.
+      const root = document.documentElement;
+      root.classList.add('js');
+
+      addEventListener('DOMContentLoaded', () => {
+        const menu = document.querySelector('.menu');
+        const links = document.querySelectorAll('#nav-links a');
+        const setMenu = (open) => menu.setAttribute('aria-expanded', open);
+        addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') {
+            setMenu(false);
+            menu.focus();
+          }
+        });
+
+        menu.addEventListener('click', () => setMenu(menu.getAttribute('aria-expanded') !== 'true'));
+        links.forEach((a) => a.addEventListener('click', () => setMenu(false)));
+
+        const reveal = new IntersectionObserver((entries) => {
+          for (const e of entries) {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              reveal.unobserve(e.target);
+            }
+          }
+        }, { rootMargin: '0px 0px -10% 0px' });
+        document.querySelectorAll('.reveal').forEach((el) => reveal.observe(el));
+
+        // Highlight the nav link of the section crossing the middle of the viewport.
+        const spy = new IntersectionObserver((entries) => {
+          for (const e of entries) {
+            if (!e.isIntersecting) continue;
+            links.forEach((a) => a.setAttribute('aria-current', a.hash === `#${e.target.id}`));
+          }
+        }, { rootMargin: '-45% 0px -50% 0px' });
+        document.querySelectorAll('main section[id]').forEach((s) => spy.observe(s));
+      });
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #0a0a0a;
+    --panel: #1a1a1a;
+    --line: #2a2a2a;
+    --control: #6e6e6e; /* borders of interactive controls: ≥3:1 on panel */
+    --fg: #ffffff;
+    --muted: #a7a7a7;
+    --accent: #347a00; /* white text on it ≥4.5:1 */
+    --on-accent: #ffffff;
+    --accent-hi: #6bc72a;
+    --display: 'Raleway', system-ui, sans-serif;
+    --mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --gutter: 5vw;
+    --nav-h: 4.5rem;
+    color-scheme: dark;
+    background: var(--bg);
+    color: var(--muted);
+    font: 400 0.95rem/1.7 var(--mono);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
+  h1, h2, h3 { font-family: var(--display); font-weight: 800; color: var(--fg); line-height: 1.15; }
+  h2 { font-size: clamp(1.75rem, 4vw, 2.25rem); margin: 0 0 2rem; }
+  h3 { font-size: 1.2rem; font-weight: 700; }
+  a { color: var(--accent-hi); transition: color 0.2s; }
+  a:hover { color: var(--fg); }
+  :focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 3px; }
+  img { max-width: 100%; height: auto; display: block; }
+  main > section { padding: 4.5rem var(--gutter); }
+  footer { text-align: center; padding: 3rem var(--gutter); font-size: 0.85rem; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .skip { position: absolute; left: 1rem; top: -100px; z-index: 20; padding: 0.75rem 1rem; background: var(--panel); color: var(--fg); }
+  .skip:focus { top: 1rem; }
+  .card {
+    padding: 1.75rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: rgb(255 255 255 / 0.015);
+    transition: border-color 0.2s, translate 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { border-color: #444; translate: 0 -3px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.5); }
+  /* Card grid: 4/3/2/1 columns; cards grow to fill a short last row. */
+  .cards { --cols: 1; --gap: 1.875rem; display: flex; flex-wrap: wrap; gap: var(--gap); margin: 0; padding: 0; list-style: none; }
+  .cards > * { flex: 1 1 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); min-width: 0; }
+  @media (min-width: 768px) { .cards { --cols: 2; } }
+  @media (min-width: 1200px) { .cards { --cols: 3; } }
+  @media (min-width: 1440px) { .cards { --cols: 4; } }
+  .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; font-size: 0.8rem; }
+  .tags li { padding: 0.1rem 0.6rem; border: 1px solid var(--line); border-radius: 999px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .enter { animation: enter 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+    .avatar.enter { animation-delay: 0.15s; }
+    .js .reveal { transition: opacity 0.7s ease, translate 0.7s ease; }
+    .js .reveal:not(.in) { opacity: 0; translate: 0 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; }
+  }
+  @keyframes enter {
+    from { opacity: 0; translate: 0 1.5rem; }
+    to { opacity: 1; translate: 0 0; }
+  }
+</style>
