@@ -1,0 +1,90 @@
+---
+import Icon from './Icon.astro';
+import { profile, contact, projects } from '../data/site';
+
+const links = [
+  { href: '#home', label: 'Home' },
+  { href: '#experience', label: 'Experience' },
+  { href: '#skills', label: 'Skills' },
+  ...(projects.length ? [{ href: '#work', label: 'Recent work' }] : []),
+  { href: '#education', label: 'Education' },
+  { href: '#contact', label: 'Get In Touch' },
+];
+const socials = [
+  { href: contact.linkedin, label: 'LinkedIn', icon: 'linkedin' },
+  { href: contact.github, label: 'GitHub', icon: 'github' },
+  { href: contact.email, label: 'Email', icon: 'mail' },
+] as const;
+---
+<header>
+  <nav aria-label="Main">
+    <a class="brand" href="#home">{profile.name}</a>
+    <button class="menu" type="button" aria-controls="nav-links" aria-expanded="false" aria-label="Menu">
+      <span></span>
+    </button>
+    <ul id="nav-links" class="links">
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+    </ul>
+    <ul class="socials">
+      {socials.map((s) => <li><a href={s.href} aria-label={s.label}><Icon name={s.icon} /></a></li>)}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  header { position: sticky; top: 0; z-index: 10; padding: 0 var(--gutter); }
+  nav {
+    max-width: var(--max);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem 2.5rem;
+    padding: 1.25rem 2rem;
+    background: var(--panel);
+    border-radius: 0 0 8px 8px;
+    flex-wrap: wrap;
+  }
+  .brand { display: none; color: var(--fg); font: 700 1.1rem var(--display); text-decoration: none; }
+  ul { display: flex; gap: 0.5rem 3rem; margin: 0; padding: 0; list-style: none; }
+  .links { flex: 1; justify-content: space-between; }
+  .links a { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
+  .links a:hover, .links a[aria-current='true'] { color: var(--fg); }
+  .socials { gap: 1.5rem; }
+  .socials a { color: var(--muted); display: grid; }
+  .socials a:hover { color: var(--fg); }
+  .menu { display: none; }
+
+  @media (max-width: 860px) {
+    nav { padding: 1rem 1.25rem; }
+    .brand { display: block; flex: 1; }
+    .links { flex-basis: 100%; order: 3; flex-direction: column; gap: 0.75rem; padding-top: 0.5rem; }
+    .socials { gap: 1rem; }
+    /* Menu collapses only when JS can open it again. */
+    :global(.js) .menu {
+      display: grid;
+      place-items: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      background: none;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      cursor: pointer;
+      order: 2;
+    }
+    .menu span, .menu span::before, .menu span::after {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--fg);
+      position: relative;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .menu span::before, .menu span::after { content: ''; position: absolute; }
+    .menu span::before { top: -6px; }
+    .menu span::after { top: 6px; }
+    .menu[aria-expanded='true'] span { background: transparent; }
+    .menu[aria-expanded='true'] span::before { transform: translateY(6px) rotate(45deg); }
+    .menu[aria-expanded='true'] span::after { transform: translateY(-6px) rotate(-45deg); }
+    :global(.js) .menu[aria-expanded='false'] ~ .links { display: none; }
+  }
+</style>

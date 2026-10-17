@@ -1,0 +1,30 @@
+---
+import { experience } from '../data/site';
+---
+<section id="experience" aria-labelledby="experience-title">
+  <h2 id="experience-title" class="reveal">Experience</h2>
+  <div class="role reveal">
+    <h3>{experience.role} · {experience.org}</h3>
+    <p class="meta">{experience.period}</p>
+    <ul class="tags">{experience.tech.map((t) => <li>{t}</li>)}</ul>
+  </div>
+  <ul class="cases">
+    {experience.cases.map((c, i) => (
+      <li class="card reveal">
+        <p class="num">0{i + 1}</p>
+        <h3>{c.title}</h3>
+        <p>{c.description}</p>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .role { margin-bottom: 2rem; }
+  .role h3 { margin: 0; }
+  .meta { color: var(--muted); margin: 0.25rem 0 1rem; }
+  .cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1.875rem; margin: 0; padding: 0; list-style: none; }
+  .num { color: var(--accent-hi); margin: 0 0 0.5rem; }
+  .card h3 { margin: 0 0 0.75rem; }
+  .card p:last-child { margin: 0; }
+</style>

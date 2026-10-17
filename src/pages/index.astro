@@ -1,13 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
-import Item from '../components/Item.astro';
-import { items } from '../data/site';
-
-const nav = items.filter((i) => i.nav);
+import Header from '../components/Header.astro';
+import Hero from '../components/Hero.astro';
+import Experience from '../components/Experience.astro';
+import Skills from '../components/Skills.astro';
+import Work from '../components/Work.astro';
+import Education from '../components/Education.astro';
+import Contact from '../components/Contact.astro';
+import { profile } from '../data/site';
 ---
 <Base>
-  <main class="items">
-    {items.map((item, i) => <Item item={item} first={i === 0} nav={nav} />)}
+  <Header />
+  <main>
+    <Hero />
+    <Experience />
+    <Skills />
+    <Work />
+    <Education />
+    <Contact />
   </main>
-  <button class="swap" type="button" aria-label="Swap columns">⇄</button>
+  <footer>© {new Date().getFullYear()} {profile.name}</footer>
 </Base>

@@ -1,0 +1,62 @@
+---
+import { Image } from 'astro:assets';
+import { profile, techStack } from '../data/site';
+import { asset } from '../lib/assets';
+---
+<section id="home" aria-labelledby="home-title">
+  <div class="intro">
+    <div class="text enter">
+      <h1 id="home-title">{profile.name}</h1>
+      <p class="role">{profile.role}</p>
+      <p>{profile.intro}</p>
+      <a class="cta" href="#contact">Get in touch <span aria-hidden="true">›</span></a>
+    </div>
+    <Image class="avatar enter" src={asset(profile.avatar)} alt={profile.avatarAlt} width={350} height={350} format="webp" loading="eager" />
+  </div>
+  <div class="stack reveal">
+    <h2>Tech stack</h2>
+    <ul>{techStack.map((t) => <li>{t}</li>)}</ul>
+  </div>
+</section>
+
+<style>
+  section { padding-top: 5rem; }
+  .intro { display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: center; }
+  h1 { font-size: clamp(2.5rem, 6vw, 3rem); margin: 0; }
+  .role { color: var(--accent-hi); margin: 0.25rem 0 1.5rem; }
+  .text p:not(.role) { max-width: 30rem; }
+  .cta {
+    display: inline-flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding: 1.1rem 4rem;
+    background: var(--accent);
+    border: 1px solid var(--accent-hi);
+    color: #fff;
+    font-weight: 700;
+    text-decoration: none;
+    box-shadow: 0 0 20px rgb(61 143 0 / 0.55);
+    transition: box-shadow 0.2s, translate 0.2s;
+  }
+  .cta:hover { color: #fff; box-shadow: 0 0 32px rgb(61 143 0 / 0.85); translate: 0 -2px; }
+  .avatar { width: min(350px, 70vw); aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
+  .stack { margin-top: 4rem; }
+  .stack h2 { font: 400 0.95rem var(--mono); color: var(--fg); margin: 0 0 1.25rem; }
+  .stack ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
+  .stack li {
+    display: grid;
+    place-items: center;
+    height: 60px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--muted);
+    font: 700 1.05rem var(--display);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .stack li:hover { border-color: var(--muted); color: var(--fg); }
+  @media (max-width: 760px) {
+    .intro { grid-template-columns: 1fr; }
+    .avatar { order: -1; margin-inline: auto; width: min(240px, 60vw); }
+    .cta { padding-inline: 2.5rem; }
+  }
+</style>

@@ -1,0 +1,37 @@
+---
+import Icon from './Icon.astro';
+import { contact } from '../data/site';
+
+const links = [
+  { href: contact.email, label: 'Email', icon: 'mail' },
+  { href: contact.github, label: 'GitHub', icon: 'github' },
+  { href: contact.linkedin, label: 'LinkedIn', icon: 'linkedin' },
+] as const;
+---
+<section id="contact" aria-labelledby="contact-title">
+  <div class="box reveal">
+    <h2 id="contact-title">Get In Touch</h2>
+    <p>Open to software engineering roles and interesting projects. The fastest way to reach me is email.</p>
+    <ul>
+      {links.map((l) => <li><a class="pill" href={l.href}><Icon name={l.icon} /> {l.label}</a></li>)}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .box { text-align: center; padding: 3.5rem 1.5rem; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+  .box p { max-width: 32rem; margin: 0 auto 2rem; }
+  ul { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; margin: 0; padding: 0; list-style: none; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--fg);
+    text-decoration: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .pill:hover { border-color: var(--accent-hi); box-shadow: 0 0 16px rgb(61 143 0 / 0.4); color: var(--fg); }
+</style>
