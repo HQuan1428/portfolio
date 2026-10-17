@@ -15,11 +15,14 @@ const logo = (name: string) => (icons as unknown as Record<string, SimpleIcon>)[
       <p>{profile.intro}</p>
       <a class="cta" href="#contact">Get in touch <span aria-hidden="true">›</span></a>
     </div>
-    <div id="education" class="edu card enter" aria-labelledby="education-title">
+    <div id="education" class="edu enter" aria-labelledby="education-title">
       <p class="label">Education</p>
       <h2 id="education-title">{education.school}</h2>
-      <p>{education.period}</p>
-      <p>GPA <strong>{education.gpa}</strong></p>
+      <dl>
+        <div><dt>Graduated</dt><dd>{education.graduated}</dd></div>
+        <div><dt>GPA</dt><dd>{education.gpa}<span>/{education.gpaScale}</span></dd></div>
+      </dl>
+      <p class="period">{education.period}</p>
     </div>
     <Image class="avatar enter" src={asset(profile.avatar)} alt={profile.avatarAlt} width={350} height={350} format="webp" loading="eager" />
   </div>
@@ -48,15 +51,40 @@ const logo = (name: string) => (icons as unknown as Record<string, SimpleIcon>)[
     gap: 3rem;
   }
   .intro { display: grid; grid-template-columns: 1fr auto auto; gap: 3rem; align-items: center; }
-  .edu { width: 16rem; }
+  /* Education reads as a stats column bridging intro and avatar: no box, hairline dividers. */
+  .edu {
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 1.25rem;
+    width: 15rem;
+    padding-inline: 2.5rem;
+    border-inline: 1px solid var(--line);
+  }
   .edu.enter { animation-delay: 0.08s; }
-  .edu .label { margin: 0 0 0.5rem; color: var(--accent-hi); font-size: 0.8rem; }
-  .edu h2 { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.75rem; }
-  .edu p { margin: 0; }
-  .edu strong { color: var(--fg); }
+  .edu .label { margin: 0; color: var(--accent-hi); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; }
+  .edu h2 { font-size: 1.15rem; font-weight: 700; margin: 0; }
+  .edu dl { display: flex; flex-direction: column; gap: 1.25rem; margin: 0; }
+  .edu dt { font-size: 0.8rem; }
+  .edu dd { margin: 0; font: 800 2.5rem/1 var(--display); color: var(--fg); }
+  .edu dd span { font-size: 1rem; color: var(--muted); font-weight: 700; }
+  .edu .period { margin: 0; font-size: 0.85rem; }
   @media (max-width: 1100px) {
     .intro { grid-template-columns: 1fr auto; }
-    .edu { grid-column: 1 / -1; width: auto; max-width: 30rem; }
+    /* Below the intro the column turns into a horizontal stats row. */
+    .edu {
+      grid-column: 1 / -1;
+      width: auto;
+      flex-flow: row wrap;
+      align-items: flex-end;
+      gap: 1rem 2.5rem;
+      padding: 1.5rem 0;
+      border-inline: 0;
+      border-block: 1px solid var(--line);
+    }
+    .edu .label, .edu h2 { flex-basis: 100%; }
+    .edu dl { flex-direction: row; gap: 2.5rem; }
     .avatar { grid-column: 2; grid-row: 1; }
   }
   h1 { font-size: clamp(2.5rem, 6vw, 3rem); margin: 0; }

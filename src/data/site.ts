@@ -117,5 +117,7 @@ export const projects: Project[] = [];
 export const education = {
   school: 'University of Science — VNUHCM',
   period: '09/2022 — 09/2026',
-  gpa: '7.36/10.0',
+  graduated: '2026',
+  gpa: '7.36',
+  gpaScale: '10',
 };
