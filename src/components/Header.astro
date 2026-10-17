@@ -8,7 +8,6 @@ const links = [
   { href: '#skills', label: 'Skills' },
   ...(projects.length ? [{ href: '#work', label: 'Recent work' }] : []),
   { href: '#education', label: 'Education' },
-  { href: '#contact', label: 'Get In Touch' },
 ];
 const socials = [
   { href: contact.linkedin, label: 'LinkedIn', icon: 'linkedin' },
@@ -24,40 +23,55 @@ const socials = [
     </button>
     <ul id="nav-links" class="links">
       {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      <li class="mobile-only"><a href="#contact">Get In Touch</a></li>
     </ul>
     <ul class="socials">
       {socials.map((s) => <li><a href={s.href} aria-label={s.label}><Icon name={s.icon} /></a></li>)}
     </ul>
+    <a class="nav-cta" href="#contact">Get In Touch</a>
   </nav>
 </header>
 
 <style>
-  header { position: sticky; top: 0; z-index: 10; padding: 0 var(--gutter); }
+  header { position: sticky; top: 0; z-index: 10; }
   nav {
-    max-width: var(--max);
-    margin: 0 auto;
     display: flex;
     align-items: center;
     gap: 1rem 2.5rem;
-    padding: 1.25rem 2rem;
+    min-height: var(--nav-h);
+    padding: 0.75rem var(--gutter);
     background: var(--panel);
-    border-radius: 0 0 8px 8px;
     flex-wrap: wrap;
   }
   .brand { display: none; color: var(--fg); font: 700 1.1rem var(--display); text-decoration: none; }
-  ul { display: flex; gap: 0.5rem 3rem; margin: 0; padding: 0; list-style: none; }
-  .links { flex: 1; justify-content: space-between; }
+  ul { display: flex; gap: 0.5rem 2.5rem; margin: 0; padding: 0; list-style: none; }
+  .links { margin-right: auto; }
   .links a { color: var(--muted); text-decoration: none; font-size: 0.95rem; }
   .links a:hover, .links a[aria-current='true'] { color: var(--fg); }
+  .mobile-only { display: none; }
   .socials { gap: 1.5rem; }
   .socials a { color: var(--muted); display: grid; }
   .socials a:hover { color: var(--fg); }
+  .nav-cta {
+    padding: 0.55rem 1.25rem;
+    background: var(--accent);
+    border: 1px solid var(--accent-hi);
+    border-radius: 4px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    box-shadow: 0 0 14px rgb(61 143 0 / 0.45);
+    transition: box-shadow 0.2s;
+  }
+  .nav-cta:hover { color: #fff; box-shadow: 0 0 24px rgb(61 143 0 / 0.8); }
   .menu { display: none; }
 
   @media (max-width: 860px) {
-    nav { padding: 1rem 1.25rem; }
     .brand { display: block; flex: 1; }
-    .links { flex-basis: 100%; order: 3; flex-direction: column; gap: 0.75rem; padding-top: 0.5rem; }
+    .links { flex-basis: 100%; order: 3; flex-direction: column; gap: 0.75rem; padding-block: 0.5rem; margin: 0; }
+    .mobile-only { display: list-item; }
+    .nav-cta { display: none; }
     .socials { gap: 1rem; }
     /* Menu collapses only when JS can open it again. */
     :global(.js) .menu {

@@ -3,7 +3,7 @@ import { skills } from '../data/site';
 ---
 <section id="skills" aria-labelledby="skills-title">
   <h2 id="skills-title" class="reveal">Skills</h2>
-  <ul class="groups">
+  <ul class="groups cards">
     {skills.map((g) => (
       <li class="card reveal">
         <h3>{g.title}</h3>
@@ -15,7 +15,6 @@ import { skills } from '../data/site';
 </section>
 
 <style>
-  .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1.875rem; margin: 0; padding: 0; list-style: none; }
   h3 { margin: 0 0 1rem; }
   .points { margin: 0 0 1.25rem; padding-left: 1.1rem; }
   .points li + li { margin-top: 0.5rem; }

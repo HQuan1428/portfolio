@@ -49,7 +49,7 @@ test('recent work is shown only when there are projects', () => {
 test('renders content from site data', () => {
   has(profile.name);
   has(profile.intro);
-  for (const t of techStack) has(t);
+  for (const t of techStack) has(t.name);
   has(experience.org);
   for (const c of experience.cases) has(c.title);
   for (const g of skills) has(g.title);
@@ -70,7 +70,8 @@ test('images are webp, lazy (except avatar), with alt', () => {
   assert.ok(imgs.length > 0);
   for (const img of imgs) {
     assert.match(img, /src="[^"]+\.webp"/, img);
-    assert.match(img, /alt="[^"]+"/, img);
+    // Decorative images (hidden from assistive tech) may have empty alt.
+    if (!/aria-hidden="true"/.test(img)) assert.match(img, /alt="[^"]+"/, img);
     if (!/class="[^"]*avatar/.test(img)) assert.match(img, /loading="lazy"/, img);
   }
 });
@@ -81,4 +82,20 @@ test('has title, description and Open Graph metadata', () => {
   for (const p of ['og:title', 'og:description', 'og:type', 'og:url', 'og:image']) {
     assert.match(html, new RegExp(`<meta property="${p}" content="[^"]+"`), p);
   }
+});
+
+test('nav has a Get In Touch CTA', () => {
+  const nav = html.split('<nav')[1].split('</nav>')[0];
+  assert.match(nav, /<a[^>]+class="[^"]*nav-cta[^"]*"[^>]+href="#contact"|<a[^>]+href="#contact"[^>]+class="[^"]*nav-cta/);
+});
+
+test('tech stack shows a logo and name per technology', () => {
+  const stack = html.split('class="stack')[1].split('</ul>')[0];
+  const tiles = stack.split('<li').slice(1);
+  assert.equal(tiles.length, techStack.length);
+  tiles.forEach((tile, i) => {
+    const t = techStack[i];
+    assert.ok(tile.includes(esc(t.name)), t.name);
+    assert.match(tile, t.icon ? /<svg/ : /<img/, t.name);
+  });
 });

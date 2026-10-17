@@ -45,7 +45,22 @@ export const contact = {
   linkedin: 'https://www.linkedin.com/in/your-handle/',
 };
 
-export const techStack: string[] = ['React', 'Go', 'Node.js', 'PostgreSQL', 'AWS', 'Claude'];
+export interface Tech {
+  name: string;
+  /** simple-icons export name, e.g. 'siReact'. */
+  icon?: string;
+  /** Logo file under src/assets/ when simple-icons has none. */
+  image?: string;
+}
+
+export const techStack: Tech[] = [
+  { name: 'React', icon: 'siReact' },
+  { name: 'Go', icon: 'siGo' },
+  { name: 'Node.js', icon: 'siNodedotjs' },
+  { name: 'PostgreSQL', icon: 'siPostgresql' },
+  { name: 'AWS', image: 'logos/aws.png' },
+  { name: 'Claude', icon: 'siClaude' },
+];
 
 export const experience = {
   org: 'AIPOWER Co., Ltd.',

@@ -2,6 +2,10 @@
 import { Image } from 'astro:assets';
 import { profile, techStack } from '../data/site';
 import { asset } from '../lib/assets';
+import * as icons from 'simple-icons';
+
+type SimpleIcon = { path: string; hex: string };
+const logo = (name: string) => (icons as unknown as Record<string, SimpleIcon>)[name];
 ---
 <section id="home" aria-labelledby="home-title">
   <div class="intro">
@@ -15,12 +19,28 @@ import { asset } from '../lib/assets';
   </div>
   <div class="stack reveal">
     <h2>Tech stack</h2>
-    <ul>{techStack.map((t) => <li>{t}</li>)}</ul>
+    <ul>
+      {techStack.map((t) => (
+        <li style={t.icon ? `--brand: #${logo(t.icon).hex}` : undefined}>
+          {t.icon && (
+            <svg viewBox="0 0 24 24" width="32" height="32" aria-hidden="true"><path d={logo(t.icon).path} fill="currentColor" /></svg>
+          )}
+          {t.image && <Image src={asset(t.image)} alt="" aria-hidden="true" width={64} format="webp" loading="lazy" />}
+          <span>{t.name}</span>
+        </li>
+      ))}
+    </ul>
   </div>
 </section>
 
 <style>
-  section { padding-top: 5rem; }
+  section {
+    min-height: calc(100svh - var(--nav-h));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3rem;
+  }
   .intro { display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: center; }
   h1 { font-size: clamp(2.5rem, 6vw, 3rem); margin: 0; }
   .role { color: var(--accent-hi); margin: 0.25rem 0 1.5rem; }
@@ -40,20 +60,26 @@ import { asset } from '../lib/assets';
   }
   .cta:hover { color: #fff; box-shadow: 0 0 32px rgb(61 143 0 / 0.85); translate: 0 -2px; }
   .avatar { width: min(350px, 70vw); aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
-  .stack { margin-top: 4rem; }
   .stack h2 { font: 400 0.95rem var(--mono); color: var(--fg); margin: 0 0 1.25rem; }
-  .stack ul { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
+  .stack ul { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
   .stack li {
     display: grid;
-    place-items: center;
-    height: 60px;
+    justify-items: center;
+    gap: 0.6rem;
+    padding: 1.25rem 0.5rem 1rem;
     border: 1px solid var(--line);
     border-radius: 4px;
     color: var(--muted);
-    font: 700 1.05rem var(--display);
+    font-size: 0.85rem;
     transition: border-color 0.2s, color 0.2s;
   }
+  .stack svg { width: 32px; height: 32px; transition: color 0.2s; }
+  .stack img { height: 32px; width: auto; filter: grayscale(1) brightness(0.75); transition: filter 0.2s; }
   .stack li:hover { border-color: var(--muted); color: var(--fg); }
+  .stack li:hover svg { color: var(--brand); }
+  .stack li:hover img { filter: none; }
+  @media (max-width: 1199px) { .stack ul { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 767px) { .stack ul { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 760px) {
     .intro { grid-template-columns: 1fr; }
     .avatar { order: -1; margin-inline: auto; width: min(240px, 60vw); }

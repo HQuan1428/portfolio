@@ -70,8 +70,8 @@ const ogImage = new URL('og.png', profile.url).href;
     --accent-hi: #6bc72a;
     --display: 'Raleway', system-ui, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, monospace;
-    --max: 1110px;
-    --gutter: 1rem;
+    --gutter: 5vw;
+    --nav-h: 4.5rem;
     color-scheme: dark;
     background: var(--bg);
     color: var(--muted);
@@ -79,7 +79,7 @@ const ogImage = new URL('og.png', profile.url).href;
   }
   *, *::before, *::after { box-sizing: border-box; }
   body { margin: 0; }
-  html { scroll-behavior: smooth; scroll-padding-top: 6rem; }
+  html { scroll-behavior: smooth; scroll-padding-top: var(--nav-h); }
   h1, h2, h3 { font-family: var(--display); font-weight: 800; color: var(--fg); line-height: 1.15; }
   h2 { font-size: clamp(1.75rem, 4vw, 2.25rem); margin: 0 0 2rem; }
   h3 { font-size: 1.2rem; font-weight: 700; }
@@ -87,7 +87,7 @@ const ogImage = new URL('og.png', profile.url).href;
   a:hover { color: var(--fg); }
   :focus-visible { outline: 2px solid var(--accent-hi); outline-offset: 3px; }
   img { max-width: 100%; height: auto; display: block; }
-  main > section { max-width: 920px; margin: 0 auto; padding: 4.5rem var(--gutter); }
+  main > section { padding: 4.5rem var(--gutter); }
   footer { text-align: center; padding: 3rem var(--gutter); font-size: 0.85rem; }
 
   .card {
@@ -98,6 +98,12 @@ const ogImage = new URL('og.png', profile.url).href;
     transition: border-color 0.2s, translate 0.2s, box-shadow 0.2s;
   }
   .card:hover { border-color: #444; translate: 0 -3px; box-shadow: 0 10px 30px rgb(0 0 0 / 0.5); }
+  /* Card grid: 4/3/2/1 columns; cards grow to fill a short last row. */
+  .cards { --cols: 1; --gap: 1.875rem; display: flex; flex-wrap: wrap; gap: var(--gap); margin: 0; padding: 0; list-style: none; }
+  .cards > * { flex: 1 1 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); min-width: 0; }
+  @media (min-width: 768px) { .cards { --cols: 2; } }
+  @media (min-width: 1200px) { .cards { --cols: 3; } }
+  @media (min-width: 1440px) { .cards { --cols: 4; } }
   .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0; padding: 0; list-style: none; font-size: 0.8rem; }
   .tags li { padding: 0.1rem 0.6rem; border: 1px solid var(--line); border-radius: 999px; }
 
