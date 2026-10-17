@@ -35,7 +35,7 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
           {techStack.map((t) => (
             <li title={t.name} style={t.icon ? `--brand: #${brand(t.icon)}` : undefined}>
               {t.icon && (
-                <svg viewBox="0 0 24 24" width="40" height="40" aria-hidden="true"><path d={logo(t.icon).path} fill="currentColor" /></svg>
+                <svg viewBox="0 0 24 24" width="56" height="56" aria-hidden="true"><path d={logo(t.icon).path} fill="currentColor" /></svg>
               )}
               {t.image && <Image src={asset(t.image)} alt="" aria-hidden="true" width={80} format="webp" loading="lazy" />}
               <span class="sr-only">{t.name}</span>
@@ -51,9 +51,11 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
   section {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    gap: 3rem;
-    padding-top: 2.5rem;
+    min-height: calc(100svh - var(--nav-h));
+    /* Equal space above the intro, between intro and stack, and below the stack. */
+    justify-content: space-evenly;
+    gap: 2rem;
+    padding-block: 0;
   }
   .intro { display: grid; grid-template-columns: minmax(0, 32rem) auto 1fr; gap: 3rem; align-items: center; }
   .avatar { justify-self: end; }
@@ -115,11 +117,11 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
     overflow: hidden;
     mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   }
-  .marquee ul { display: flex; flex-shrink: 0; gap: 3.5rem; margin: 0; padding: 0 1.75rem; list-style: none; animation: slide 40s linear infinite; }
+  .marquee ul { display: flex; flex-shrink: 0; gap: 4.5rem; margin: 0; padding: 0 2.25rem; list-style: none; animation: slide 40s linear infinite; }
   .marquee:hover ul { animation-play-state: paused; }
-  .marquee li { display: grid; place-items: center; height: 56px; color: var(--muted); }
-  .marquee svg { width: 40px; height: 40px; transition: color 0.2s; }
-  .marquee img { height: 34px; width: auto; filter: grayscale(1) brightness(0.75); transition: filter 0.2s; }
+  .marquee li { display: grid; place-items: center; height: 80px; color: var(--muted); }
+  .marquee svg { width: 56px; height: 56px; transition: color 0.2s; }
+  .marquee img { height: 48px; width: auto; filter: grayscale(1) brightness(0.75); transition: filter 0.2s; }
   .marquee li:hover svg { color: var(--brand); }
   .marquee li:hover img { filter: none; }
   @keyframes slide { to { translate: -100% 0; } }
