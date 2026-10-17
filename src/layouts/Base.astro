@@ -37,15 +37,6 @@ const ogImage = new URL('og.png', profile.url).href;
           }
         });
 
-        const marquee = document.querySelector('.marquee');
-        const pause = document.querySelector('.pause');
-        const setPaused = (on) => {
-          marquee.classList.toggle('paused', on);
-          pause.setAttribute('aria-pressed', on);
-          try { localStorage.setItem('marquee-paused', on ? '1' : '0'); } catch {}
-        };
-        try { if (localStorage.getItem('marquee-paused') === '1') setPaused(true); } catch {}
-        pause.addEventListener('click', () => setPaused(pause.getAttribute('aria-pressed') !== 'true'));
         menu.addEventListener('click', () => setMenu(menu.getAttribute('aria-expanded') !== 'true'));
         links.forEach((a) => a.addEventListener('click', () => setMenu(false)));
 

@@ -120,6 +120,3 @@ test('dates use <time>', () => {
   assert.match(html, /<time datetime="\d{4}(-\d{2})?">/);
 });
 
-test('tech stack marquee has a pause control', () => {
-  assert.match(html, /<button[^>]+class="[^"]*pause[^"]*"[^>]+aria-pressed="false"/);
-});
