@@ -60,6 +60,16 @@ export const techStack: Tech[] = [
   { name: 'PostgreSQL', icon: 'siPostgresql' },
   { name: 'AWS', image: 'logos/aws.png' },
   { name: 'Claude', icon: 'siClaude' },
+  { name: 'Rust', icon: 'siRust' },
+  { name: 'Next.js', icon: 'siNextdotjs' },
+  { name: 'C++', icon: 'siCplusplus' },
+  { name: '.NET', icon: 'siDotnet' },
+  { name: 'Unity', icon: 'siUnity' },
+  { name: 'DeepSeek', icon: 'siDeepseek' },
+  { name: 'Flutter', icon: 'siFlutter' },
+  { name: 'MySQL', icon: 'siMysql' },
+  { name: 'MongoDB', icon: 'siMongodb' },
+  { name: 'Google Cloud', icon: 'siGooglecloud' },
 ];
 
 export const experience = {
