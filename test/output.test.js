@@ -29,7 +29,7 @@ test('self-hosts woff2 fonts', () => {
   assert.doesNotMatch(html, /fonts\.googleapis|fonts\.gstatic/);
 });
 
-const sections = ['home', 'experience', 'skills', 'education', 'contact'];
+const sections = ['home', 'experience', 'skills', 'contact'];
 
 test('renders landmarks, sections and nav links', () => {
   for (const tag of ['<header', '<nav', '<main', '<footer']) assert.ok(html.includes(tag), tag);
@@ -98,4 +98,10 @@ test('tech stack shows a logo and name per technology', () => {
     assert.ok(tile.includes(esc(t.name)), t.name);
     assert.match(tile, t.icon ? /<svg/ : /<img/, t.name);
   });
+});
+
+test('education sits in the hero between intro and avatar', () => {
+  const hero = html.split('id="home"')[1].split('</section>')[0];
+  const [intro, edu, avatar] = ['home-title', 'id="education"', 'class="avatar'].map((m) => hero.indexOf(m));
+  assert.ok(intro >= 0 && intro < edu && edu < avatar, 'order intro < education < avatar');
 });

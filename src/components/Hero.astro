@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { profile, techStack } from '../data/site';
+import { profile, techStack, education } from '../data/site';
 import { asset } from '../lib/assets';
 import * as icons from 'simple-icons';
 
@@ -14,6 +14,12 @@ const logo = (name: string) => (icons as unknown as Record<string, SimpleIcon>)[
       <p class="role">{profile.role}</p>
       <p>{profile.intro}</p>
       <a class="cta" href="#contact">Get in touch <span aria-hidden="true">›</span></a>
+    </div>
+    <div id="education" class="edu card enter" aria-labelledby="education-title">
+      <p class="label">Education</p>
+      <h2 id="education-title">{education.school}</h2>
+      <p>{education.period}</p>
+      <p>GPA <strong>{education.gpa}</strong></p>
     </div>
     <Image class="avatar enter" src={asset(profile.avatar)} alt={profile.avatarAlt} width={350} height={350} format="webp" loading="eager" />
   </div>
@@ -41,7 +47,18 @@ const logo = (name: string) => (icons as unknown as Record<string, SimpleIcon>)[
     justify-content: center;
     gap: 3rem;
   }
-  .intro { display: grid; grid-template-columns: 1fr auto; gap: 3rem; align-items: center; }
+  .intro { display: grid; grid-template-columns: 1fr auto auto; gap: 3rem; align-items: center; }
+  .edu { width: 16rem; }
+  .edu.enter { animation-delay: 0.08s; }
+  .edu .label { margin: 0 0 0.5rem; color: var(--accent-hi); font-size: 0.8rem; }
+  .edu h2 { font-size: 1.2rem; font-weight: 700; margin: 0 0 0.75rem; }
+  .edu p { margin: 0; }
+  .edu strong { color: var(--fg); }
+  @media (max-width: 1100px) {
+    .intro { grid-template-columns: 1fr auto; }
+    .edu { grid-column: 1 / -1; width: auto; max-width: 30rem; }
+    .avatar { grid-column: 2; grid-row: 1; }
+  }
   h1 { font-size: clamp(2.5rem, 6vw, 3rem); margin: 0; }
   .role { color: var(--accent-hi); margin: 0.25rem 0 1.5rem; }
   .text p:not(.role) { max-width: 30rem; }
@@ -82,7 +99,8 @@ const logo = (name: string) => (icons as unknown as Record<string, SimpleIcon>)[
   @media (max-width: 767px) { .stack ul { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 760px) {
     .intro { grid-template-columns: 1fr; }
-    .avatar { order: -1; margin-inline: auto; width: min(240px, 60vw); }
+    .edu { grid-column: auto; }
+    .avatar { order: -1; grid-column: auto; grid-row: auto; margin-inline: auto; width: min(240px, 60vw); }
     .cta { padding-inline: 2.5rem; }
   }
 </style>
