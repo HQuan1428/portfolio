@@ -30,6 +30,22 @@ const ogImage = new URL('og.png', profile.url).href;
         const menu = document.querySelector('.menu');
         const links = document.querySelectorAll('#nav-links a');
         const setMenu = (open) => menu.setAttribute('aria-expanded', open);
+        addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') {
+            setMenu(false);
+            menu.focus();
+          }
+        });
+
+        const marquee = document.querySelector('.marquee');
+        const pause = document.querySelector('.pause');
+        const setPaused = (on) => {
+          marquee.classList.toggle('paused', on);
+          pause.setAttribute('aria-pressed', on);
+          try { localStorage.setItem('marquee-paused', on ? '1' : '0'); } catch {}
+        };
+        try { if (localStorage.getItem('marquee-paused') === '1') setPaused(true); } catch {}
+        pause.addEventListener('click', () => setPaused(pause.getAttribute('aria-pressed') !== 'true'));
         menu.addEventListener('click', () => setMenu(menu.getAttribute('aria-expanded') !== 'true'));
         links.forEach((a) => a.addEventListener('click', () => setMenu(false)));
 
@@ -55,6 +71,7 @@ const ogImage = new URL('og.png', profile.url).href;
     </script>
   </head>
   <body>
+    <a class="skip" href="#main">Skip to content</a>
     <slot />
   </body>
 </html>
@@ -64,9 +81,11 @@ const ogImage = new URL('og.png', profile.url).href;
     --bg: #0a0a0a;
     --panel: #1a1a1a;
     --line: #2a2a2a;
+    --control: #6e6e6e; /* borders of interactive controls: ≥3:1 on panel */
     --fg: #ffffff;
     --muted: #a7a7a7;
-    --accent: #3d8f00;
+    --accent: #347a00; /* white text on it ≥4.5:1 */
+    --on-accent: #ffffff;
     --accent-hi: #6bc72a;
     --display: 'Raleway', system-ui, sans-serif;
     --mono: 'IBM Plex Mono', ui-monospace, monospace;
@@ -91,6 +110,8 @@ const ogImage = new URL('og.png', profile.url).href;
   footer { text-align: center; padding: 3rem var(--gutter); font-size: 0.85rem; }
 
   .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .skip { position: absolute; left: 1rem; top: -100px; z-index: 20; padding: 0.75rem 1rem; background: var(--panel); color: var(--fg); }
+  .skip:focus { top: 1rem; }
   .card {
     padding: 1.75rem;
     border: 1px solid var(--line);

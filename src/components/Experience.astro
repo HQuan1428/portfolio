@@ -1,11 +1,12 @@
 ---
+import Period from './Period.astro';
 import { experience } from '../data/site';
 ---
 <section id="experience" aria-labelledby="experience-title">
   <h2 id="experience-title" class="reveal">Experience</h2>
   <div class="role reveal">
     <h3>{experience.role} · {experience.org}</h3>
-    <p class="meta">{experience.period}</p>
+    <p class="meta"><Period start={experience.start} end={experience.end} /></p>
     <ul class="tags">{experience.tech.map((t) => <li>{t}</li>)}</ul>
   </div>
   <ul class="cases cards">

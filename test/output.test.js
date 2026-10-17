@@ -90,7 +90,7 @@ test('nav has a Get In Touch CTA', () => {
 });
 
 test('tech stack shows a logo and name per technology', () => {
-  const stack = html.split('class="stack')[1].split('</ul>')[0];
+  const stack = html.split('class="marquee')[1].split('</ul>')[0];
   const tiles = stack.split('<li').slice(1);
   assert.equal(tiles.length, techStack.length);
   tiles.forEach((tile, i) => {
@@ -104,4 +104,22 @@ test('education sits in the hero between intro and avatar', () => {
   const hero = html.split('id="home"')[1].split('</section>')[0];
   const [intro, edu, avatar] = ['home-title', 'id="education"', 'class="avatar'].map((m) => hero.indexOf(m));
   assert.ok(intro >= 0 && intro < edu && edu < avatar, 'order intro < education < avatar');
+});
+
+test('skip link is the first focusable element and targets main', () => {
+  const body = html.split('<body')[1];
+  assert.match(body, /^[^>]*>\s*<a[^>]+href="#main"[^>]*>Skip to content/);
+  assert.match(html, /<main[^>]+id="main"/);
+});
+
+test('Vietnamese text is marked lang="vi"', () => {
+  assert.match(html, new RegExp(`<[^>]+lang="vi"[^>]*>${profile.name}<`));
+});
+
+test('dates use <time>', () => {
+  assert.match(html, /<time datetime="\d{4}(-\d{2})?">/);
+});
+
+test('tech stack marquee has a pause control', () => {
+  assert.match(html, /<button[^>]+class="[^"]*pause[^"]*"[^>]+aria-pressed="false"/);
 });

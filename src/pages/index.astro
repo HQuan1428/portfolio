@@ -10,12 +10,12 @@ import { profile } from '../data/site';
 ---
 <Base>
   <Header />
-  <main>
+  <main id="main" tabindex="-1">
     <Hero />
     <Experience />
     <Skills />
     <Work />
     <Contact />
   </main>
-  <footer>© {new Date().getFullYear()} {profile.name}</footer>
+  <footer>© {new Date().getFullYear()} <span lang="vi">{profile.name}</span></footer>
 </Base>

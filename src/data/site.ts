@@ -75,7 +75,9 @@ export const techStack: Tech[] = [
 export const experience = {
   org: 'AIPOWER Co., Ltd.',
   role: 'Software Development Intern',
-  period: '04/2026 — 10/2026',
+  /** Year-month, rendered as <time>. */
+  start: '2026-04',
+  end: '2026-10',
   tech: ['React', 'Golang', 'PostgreSQL', 'Zalo Mini Program', 'AI tuning'],
   cases: [
     {
@@ -126,6 +128,7 @@ export const projects: Project[] = [];
 
 export const education = {
   school: 'University of Science — VNUHCM',
-  period: '09/2022 — 09/2026',
+  start: '2022-09',
+  end: '2026-09',
   graduated: '2026',
 };

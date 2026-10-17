@@ -16,7 +16,7 @@ const socials = [
 ---
 <header>
   <nav aria-label="Main">
-    <a class="brand" href="#home">{profile.name}</a>
+    <a class="brand" href="#home" lang="vi">{profile.name}</a>
     <button class="menu" type="button" aria-controls="nav-links" aria-expanded="false" aria-label="Menu">
       <span></span>
     </button>
@@ -49,21 +49,21 @@ const socials = [
   .links a:hover, .links a[aria-current='true'] { color: var(--fg); }
   .mobile-only { display: none; }
   .socials { gap: 1.5rem; }
-  .socials a { color: var(--muted); display: grid; }
+  .socials a { color: var(--muted); display: grid; place-items: center; min-width: 24px; min-height: 24px; }
   .socials a:hover { color: var(--fg); }
   .nav-cta {
     padding: 0.55rem 1.25rem;
     background: var(--accent);
     border: 1px solid var(--accent-hi);
     border-radius: 4px;
-    color: #fff;
+    color: var(--on-accent);
     font-weight: 700;
     font-size: 0.9rem;
     text-decoration: none;
     box-shadow: 0 0 14px rgb(61 143 0 / 0.45);
     transition: box-shadow 0.2s;
   }
-  .nav-cta:hover { color: #fff; box-shadow: 0 0 24px rgb(61 143 0 / 0.8); }
+  .nav-cta:hover { color: var(--on-accent); box-shadow: 0 0 24px rgb(61 143 0 / 0.8); }
   .menu { display: none; }
 
   @media (max-width: 860px) {
@@ -79,7 +79,7 @@ const socials = [
       width: 2.5rem;
       height: 2.5rem;
       background: none;
-      border: 1px solid var(--line);
+      border: 1px solid var(--control);
       border-radius: 6px;
       cursor: pointer;
       order: 2;

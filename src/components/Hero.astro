@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { profile, techStack, education } from '../data/site';
 import { asset } from '../lib/assets';
+import Period from './Period.astro';
 import * as icons from 'simple-icons';
 
 type SimpleIcon = { path: string; hex: string };
@@ -12,7 +13,7 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
 <section id="home" aria-labelledby="home-title">
   <div class="intro">
     <div class="text enter">
-      <h1 id="home-title">{profile.name}</h1>
+      <h1 id="home-title" lang="vi">{profile.name}</h1>
       <p class="role">{profile.role}</p>
       <p>{profile.intro}</p>
       <a class="cta" href="#contact">Get in touch <span aria-hidden="true">›</span></a>
@@ -23,12 +24,17 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
       <dl>
         <div><dt>Graduated</dt><dd>{education.graduated}</dd></div>
       </dl>
-      <p class="period">{education.period}</p>
+      <p class="period"><Period start={education.start} end={education.end} /></p>
     </div>
     <Image class="avatar enter" src={asset(profile.avatar)} alt={profile.avatarAlt} width={460} height={460} format="webp" loading="eager" />
   </div>
   <div class="stack reveal">
-    <h2>Tech stack</h2>
+    <div class="stack-head">
+      <h2>Tech stack</h2>
+      <button class="pause" type="button" aria-pressed="false" aria-label="Pause logo animation">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path class="i-pause" d="M7 5h3v14H7zM14 5h3v14h-3z" /><path class="i-play" d="M8 5v14l11-7z" /></svg>
+      </button>
+    </div>
     <div class="marquee">
       {[false, true].map((copy) => (
         <ul aria-hidden={copy ? 'true' : undefined}>
@@ -100,13 +106,13 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
     padding: 1.1rem 4rem;
     background: var(--accent);
     border: 1px solid var(--accent-hi);
-    color: #fff;
+    color: var(--on-accent);
     font-weight: 700;
     text-decoration: none;
     box-shadow: 0 0 20px rgb(61 143 0 / 0.55);
     transition: box-shadow 0.2s, translate 0.2s;
   }
-  .cta:hover { color: #fff; box-shadow: 0 0 32px rgb(61 143 0 / 0.85); translate: 0 -2px; }
+  .cta:hover { color: var(--on-accent); box-shadow: 0 0 32px rgb(61 143 0 / 0.85); translate: 0 -2px; }
   .avatar { width: min(460px, 32vw); aspect-ratio: 1; border-radius: 50%; object-fit: cover; }
   .stack h2 { font: 400 0.95rem var(--mono); color: var(--fg); margin: 0 0 1.25rem; }
   /* Stack fills the space under the intro and centres itself in it. */
@@ -119,7 +125,25 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
     mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
   }
   .marquee ul { display: flex; flex-shrink: 0; gap: 4.5rem; margin: 0; padding: 0 2.25rem; list-style: none; animation: slide 40s linear infinite; }
-  .marquee:hover ul { animation-play-state: paused; }
+  .marquee:is(:hover, :focus-within, .paused) ul { animation-play-state: paused; }
+  .stack-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+  .stack-head h2 { margin: 0; }
+  .pause { display: none; }
+  :global(.js) .pause {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--control);
+    border-radius: 4px;
+    background: none;
+    color: var(--fg);
+    cursor: pointer;
+  }
+  .pause path { fill: currentColor; }
+  .pause .i-play, .pause[aria-pressed='true'] .i-pause { display: none; }
+  .pause[aria-pressed='true'] .i-play { display: inline; }
   .marquee li { display: grid; place-items: center; height: 80px; color: var(--muted); }
   .marquee svg { width: 56px; height: 56px; transition: color 0.2s; }
   .marquee img { height: 48px; width: auto; filter: grayscale(1) brightness(0.75); transition: filter 0.2s; }
@@ -130,6 +154,7 @@ const brand = (name: string) => (logo(name).hex === '000000' ? 'fff' : logo(name
     .marquee { mask-image: none; }
     .marquee ul { animation: none; flex-wrap: wrap; flex-shrink: 1; row-gap: 1.5rem; }
     .marquee ul[aria-hidden] { display: none; }
+    :global(.js) .pause { display: none; }
   }
   @media (max-width: 760px) {
     .intro { grid-template-columns: 1fr; }
